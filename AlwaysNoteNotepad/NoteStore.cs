@@ -10,11 +10,12 @@ namespace AlwaysNote {
         private readonly string noteFolder;
         private readonly Regex matchUntitled = new(@"^Untitled Note (\d+)$");
         private string currentNote;
+        private string currentNoteText;
 
         public readonly ObservableCollection<string> NoteNames = new();
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public String CurrentNote {
+        public string CurrentNote {
             get {
                 EnsureCurrentNote();
 
@@ -23,26 +24,30 @@ namespace AlwaysNote {
 
             set {
                 currentNote = value;
+                currentNoteText = GetNoteText(CurrentNote);
 
                 NotifyPropertyChanged("CurrentNote");
                 NotifyPropertyChanged("CurrentNoteText");
 
-                if (!Directory.Exists(dataFolder)) {
-                    Directory.CreateDirectory(dataFolder);
-                }
+                if (!Directory.Exists(dataFolder)) Directory.CreateDirectory(dataFolder);
 
                 File.WriteAllTextAsync(Path.Combine(dataFolder, "CurrentNote"), value);
             }
         }
 
-        public String CurrentNoteText {
+        public string CurrentNoteText {
             get {
-                return GetNoteText(CurrentNote);
+                EnsureCurrentNote();
+
+                return currentNoteText;
             }
 
             set {
-                SetNoteText(CurrentNote, value);
+                currentNoteText = value;
+
                 NotifyPropertyChanged("CurrentNoteText");
+
+                SetNoteText(CurrentNote, value);
             }
         }
 
@@ -65,27 +70,22 @@ namespace AlwaysNote {
         }
 
         public void LoadNoteNames() {
-            if (!Directory.Exists(noteFolder)) {
-                return;
-            }
+            if (!Directory.Exists(noteFolder)) return;
 
             string[] filePaths = Directory.GetFiles(noteFolder);
 
             foreach (string filePath in filePaths) {
-                if (Path.GetExtension(filePath) != ".txt") {
-                    continue;
-                }
+                if (Path.GetExtension(filePath) != ".txt") continue;
 
                 NoteNames.Add(Path.GetFileNameWithoutExtension(filePath));
             }
         }
 
         public void LoadCurrentNote() {
-            if (!File.Exists(Path.Combine(dataFolder, "CurrentNote"))) {
-                return;
-            }
+            if (!File.Exists(Path.Combine(dataFolder, "CurrentNote"))) return;
 
             currentNote = File.ReadAllText(Path.Combine(dataFolder, "CurrentNote"));
+            currentNoteText = GetNoteText(CurrentNote);
         }
 
         public int GetNextUntitledNum() {
@@ -94,9 +94,7 @@ namespace AlwaysNote {
             foreach (string noteName in NoteNames) {
                 Match untitledMatch = matchUntitled.Match(noteName);
 
-                if (!untitledMatch.Success) {
-                    continue;
-                }
+                if (!untitledMatch.Success) continue;
 
                 int untitledNum = int.Parse(untitledMatch.Groups[1].Value, System.Globalization.NumberStyles.None);
 
@@ -119,17 +117,13 @@ namespace AlwaysNote {
         }
 
         public void SetNoteText(string noteName, string noteText) {
-            if (!Directory.Exists(noteFolder)) {
-                Directory.CreateDirectory(noteFolder);
-            }
+            if (!Directory.Exists(noteFolder)) Directory.CreateDirectory(noteFolder);
 
             File.WriteAllTextAsync(GetNotePath(noteName), noteText);
         }
 
         public void AddNote(string noteName) {
-            if (noteName == "") {
-                noteName = GetUnnamedNoteName();
-            }
+            if (noteName == "") noteName = GetUnnamedNoteName();
 
             NoteNames.Add(noteName);
             SetNoteText(noteName, "");
@@ -142,9 +136,7 @@ namespace AlwaysNote {
 
             string path = GetNotePath(noteName);
 
-            if (File.Exists(path)) {
-                File.Delete(path);
-            }
+            if (File.Exists(path)) File.Delete(path);
         }
 
         public void RenameNote(string oldNoteName, string newNoteName) {
@@ -177,9 +169,7 @@ namespace AlwaysNote {
             foreach (string name in NoteNames) {
                 Match untitledMatch = matchUntitled.Match(name);
 
-                if (!untitledMatch.Success) {
-                    continue;
-                }
+                if (!untitledMatch.Success) continue;
 
                 int untitledNum = int.Parse(untitledMatch.Groups[1].Value);
 
