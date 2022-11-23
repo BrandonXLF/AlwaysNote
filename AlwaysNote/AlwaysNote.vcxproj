@@ -25,7 +25,7 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="icon.ico">
+    <Image Include="..\images\icon.ico">
       <DeploymentContent>false</DeploymentContent>
     </Image>
   </ItemGroup>

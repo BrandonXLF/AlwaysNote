@@ -1,5 +1,5 @@
 !define APP_NAME "AlwaysNote"
-!define APP_ICON "AlwaysNote\icon.ico"
+!define APP_ICON "images\icon.ico"
 !define LICENSE_FILE "LICENSE"
 !define REG_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"
 
