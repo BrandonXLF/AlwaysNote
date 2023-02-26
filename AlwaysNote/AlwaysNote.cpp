@@ -15,14 +15,6 @@ const UINT WM_ICON_NOTIFY = 34592;
 NOTIFYICONDATA iconData;
 HANDLE alwaysNoteProcess;
 
-BOOL EnumWindowsProc(HWND hwnd, LPARAM threadId) {
-    if (threadId == GetWindowThreadProcessId(hwnd, NULL)) {
-        MessageBox(NULL, L"True", L"True2", MB_OK);
-    }
-
-    return TRUE;
-}
-
 void CreateNotepad(BOOL toggle = FALSE) {
     if (alwaysNoteProcess && WaitForSingleObject(alwaysNoteProcess, 0) != WAIT_OBJECT_0) {
         if (!toggle) return;
@@ -32,9 +24,10 @@ void CreateNotepad(BOOL toggle = FALSE) {
     }
 
     STARTUPINFO si;
-    PROCESS_INFORMATION pi;
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
+
+    PROCESS_INFORMATION pi;
     ZeroMemory(&pi, sizeof(pi));
 
     CreateProcess(NULL, _tcsdup(L"AlwaysNoteNotepad.exe"), NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi);

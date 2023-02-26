@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 
 namespace AlwaysNote {
-
     public partial class TextDialog : Window {
         public string NewValue { get; internal set; }
 
