@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Animation;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace AlwaysNote {
     public partial class NoteBox : UserControl {
@@ -50,66 +51,88 @@ namespace AlwaysNote {
         }
 
         private void FindReplace_Toggle(object sender, RoutedEventArgs e) {
-            DoubleAnimation animation = new DoubleAnimation();
-            animation.Duration = TimeSpan.FromMilliseconds(50);
+            DoubleAnimation animation = new() {
+                Duration = TimeSpan.FromMilliseconds(50)
+            };
 
-            if (FindReplace.Height == 0) {
-                animation.From = 0;
-                animation.To = FindReplace.ActualHeight;
+            animation.From = FindReplace.Height == 0 ? 0 : FindReplace.ActualHeight;
+            animation.To = FindReplace.Height == 0 ? FindReplace.ActualHeight : 0;
 
-                FindReplace.BeginAnimation(HeightProperty, animation);
-            } else {
-                animation.From = FindReplace.ActualHeight;
-                animation.To = 0;
+            FindReplace.BeginAnimation(HeightProperty, animation);
+        }
 
-                FindReplace.BeginAnimation(HeightProperty, animation);
+        private string FindText {
+            get => useRegex.IsChecked == true ? find.Text : Regex.Escape(find.Text);
+        }
+
+        private string ReplaceText {
+            get => useRegex.IsChecked == true ? replace.Text : replace.Text.Replace("$", "$$");
+        }
+
+        private RegexOptions RegexFlags {
+            get {
+                RegexOptions flags = RegexOptions.Multiline;
+
+                if (!(MatchCaseCheckbox.IsChecked ?? false))
+                    flags |= RegexOptions.IgnoreCase;
+
+                return flags;
             }
+        }
+
+        private void HighlightMatch(int relIndex) {
+            try {
+                MatchCollection matches = Regex.Matches(textBox.Text, FindText, RegexFlags);
+
+                if (matches.Count == 0) {
+                    textBox.SelectionLength = 0;
+                    matchesStatus.Text = "";
+
+                    return;
+                }
+
+                matchCase += relIndex;
+
+                if (matchCase < 0)
+                    matchCase = matches.Count - 1;
+
+                if (matchCase > matches.Count - 1)
+                    matchCase = 0;
+
+                IInputElement focused = FocusManager.GetFocusedElement(FocusManager.GetFocusScope(this));
+
+                textBox.Focus();
+                textBox.Select(matches[matchCase].Index, matches[matchCase].Length);
+                focused.Focus();
+
+                matchesStatus.Text = (matchCase + 1) + "/" + matches.Count;
+            } catch { }
+        }
+
+        private void Find_TextChanged(object sender, RoutedEventArgs e) {
+            HighlightMatch(-matchCase);
         }
 
         private void FindPrev_Click(object sender, RoutedEventArgs e) {
-            RegexOptions flags = RegexOptions.Multiline;
-
-            if (!(MatchCaseCheckbox.IsChecked ?? false)) flags |= RegexOptions.IgnoreCase;
-
-            MatchCollection matches = Regex.Matches(textBox.Text, find.Text, flags);
-            if (matches.Count == 0) return;
-
-            matchCase--;
-
-            if (matchCase < 0 || matchCase > matches.Count - 1) {
-                matchCase = matches.Count - 1;
-            }
-
-            textBox.Focus();
-            textBox.Select(matches[matchCase].Index, matches[matchCase].Length);
+            HighlightMatch(-1);
         }
 
         private void FindNext_Click(object sender, RoutedEventArgs e) {
-            RegexOptions flags = RegexOptions.Multiline;
+            HighlightMatch(1);
+        }
 
-            if (!(MatchCaseCheckbox.IsChecked ?? false)) flags |= RegexOptions.IgnoreCase;
+        private void ReplaceOne_Click(object sender, RoutedEventArgs e) {
+            int counter = 0;
 
-            MatchCollection matches = Regex.Matches(textBox.Text, find.Text, flags);
-            if (matches.Count == 0) return;
+            string eval(Match match) =>
+                counter++ == matchCase ? match.Result(ReplaceText) : match.Value;
 
-            matchCase++;
-
-            if (matchCase < 0 || matchCase > matches.Count - 1) {
-                matchCase = 0;
-            }
-
-            textBox.Focus();
-            textBox.Select(matches[matchCase].Index, matches[matchCase].Length);
+            textBox.Text = Regex.Replace(textBox.Text, FindText, eval, RegexFlags);
+            HighlightMatch(0);
         }
 
         private void ReplaceAll_Click(object sender, RoutedEventArgs e) {
-            string oldStr = (useRegex.IsChecked ?? false) ? find.Text : Regex.Escape(find.Text);
-            string newStr = (useRegex.IsChecked ?? false) ? replace.Text : replace.Text.Replace("$", "$$");
-            RegexOptions flags = RegexOptions.Multiline;
-
-            if (!(MatchCaseCheckbox.IsChecked ?? false)) flags |= RegexOptions.IgnoreCase;
-
-            textBox.Text = Regex.Replace(textBox.Text, oldStr, newStr, flags);
+            textBox.Text = Regex.Replace(textBox.Text, FindText, ReplaceText, RegexFlags);
         }
 
         private void FindBox_GotFocus(object sender, RoutedEventArgs e) {
