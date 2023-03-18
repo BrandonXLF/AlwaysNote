@@ -1,6 +1,4 @@
 !define APP_NAME "AlwaysNote"
-!define APP_ICON "images\icon.ico"
-!define LICENSE_FILE "LICENSE"
 !define REG_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"
 
 Name "${APP_NAME}"
@@ -8,31 +6,27 @@ BrandingText " "
 OutFile "out\${APP_NAME} Installer.exe"
 Unicode True
 
-!define PRODUCT "${APP_NAME}"
-!define SHORT_PRODUCT_NAME "${APP_NAME}"
+!define MULTIUSER_MUI
+!define MULTIUSER_USE_PROGRAMFILES64
 !define MULTIUSER_EXECUTIONLEVEL "Highest"
 !define MULTIUSER_INSTALLMODE_COMMANDLINE
-!define MULTIUSER_MUI
+!define MULTIUSER_INSTALLMODE_INSTDIR "${APP_NAME}"
 !define MULTIUSER_INSTALLMODE_DEFAULT_REGISTRY_KEY "${REG_KEY}"
 !define MULTIUSER_INSTALLMODE_DEFAULT_REGISTRY_VALUENAME "UninstallString"
 !define MULTIUSER_INSTALLMODE_INSTDIR_REGISTRY_KEY "${REG_KEY}"
 !define MULTIUSER_INSTALLMODE_INSTDIR_REGISTRY_VALUENAME "InstallLocation"
-!define MULTIUSER_INSTALLMODE_INSTALL_REGISTRY_KEY "${APP_NAME}"
-!define MULTIUSER_INSTALLMODE_UNINSTALL_REGISTRY_KEY "${APP_NAME}" 
-!define MULTIUSER_INSTALLMODE_ALLOW_ELEVATION
-!define MULTIUSER_INSTALLMODE_DEFAULT_ALLUSERS
+
 !define MUI_COMPONENTSPAGE_SMALLDESC
 !define MUI_FINISHPAGE_NOAUTOCLOSE
-!define MUI_ICON "${APP_ICON}"
-!define MUI_UNICON "${APP_ICON}"
-!define MULTIUSER_INSTALLMODE_INSTDIR "${APP_NAME}"
+!define MUI_ICON "images\icon.ico"
+!define MUI_UNICON "images\icon.ico"
 !define MUI_FINISHPAGE_RUN "$INSTDIR\${APP_NAME}.exe"
 !define MUI_FINISHPAGE_RUN_TEXT "Launch ${APP_NAME}"
 
-!include MUI2.nsh
 !include MultiUser.nsh
 
-!insertmacro MUI_PAGE_LICENSE "${LICENSE_FILE}"
+!insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_LICENSE "LICENSE"
 !insertmacro MULTIUSER_PAGE_INSTALLMODE
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_COMPONENTS
@@ -41,11 +35,10 @@ Unicode True
 
 !insertmacro MUI_UNPAGE_WELCOME
 !insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_COMPONENTS
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_UNPAGE_FINISH
 !insertmacro MUI_LANGUAGE "English"
-
-InstallDir "$PROGRAMFILES\${APP_NAME}"
 
 Function .onInit
 	!insertmacro MULTIUSER_INIT
@@ -65,7 +58,7 @@ Section "${APP_NAME}" S1
 	WriteRegStr SHCTX "${REG_KEY}" "Publisher" "Brandon Fowler"
 	WriteRegDWORD SHCTX "${REG_KEY}" "NoModify" "1"
 	WriteRegDWORD SHCTX "${REG_KEY}" "NoRepair" "1"
-	WriteRegStr SHCTX "${REG_KEY}" "UninstallString" "$INSTDIR\uninstall.exe"
+	WriteRegStr SHCTX "${REG_KEY}" "UninstallString" '"$INSTDIR\${APP_NAME} Uninstaller.exe"'
 	WriteRegStr SHCTX "${REG_KEY}" "DisplayIcon" "$INSTDIR\${APP_NAME}.exe"
 SectionEnd
 
@@ -81,13 +74,11 @@ Section "Run On Startup" S4
 	CreateShortcut "$SMSTARTUP\${APP_NAME}.lnk" "$INSTDIR\${APP_NAME}.exe" --minimized
 SectionEnd
 
-Section "Uninstall"
-	Delete "$INSTDIR\uninstall.exe"
-	Delete "$INSTDIR\${APP_NAME}.exe"
+Section "Uninstall" S5
+	RMDir /r /REBOOTOK $INSTDIR
 	Delete "$SMPROGRAMS\${APP_NAME}.lnk"
-	Delete "$DESKTOP\${APP_NAME}.lnk"
 	Delete "$SMSTARTUP\${APP_NAME}.lnk"
-	RMDir $INSTDIR
+	Delete "$DESKTOP\${APP_NAME}.lnk"
 	DeleteRegKey SHCTX "${REG_KEY}"
 SectionEnd
 
