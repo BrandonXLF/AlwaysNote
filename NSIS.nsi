@@ -82,9 +82,24 @@ Section "Uninstall" S5
 	DeleteRegKey SHCTX "${REG_KEY}"
 SectionEnd
 
+Section /o "un.Remove Notes" S6
+	SetShellVarContext current
+	
+	RMDIR /r /REBOOTOK "$APPDATA\AlwaysNote"
+	
+	${if} $MultiUser.InstallMode == "AllUsers"
+		SetShellVarContext all
+	${endif}
+SectionEnd
+
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 !insertmacro MUI_DESCRIPTION_TEXT ${S1} "Install ${APP_NAME} and its core file(s)"
 !insertmacro MUI_DESCRIPTION_TEXT ${S2} "Add a shortcut to ${APP_NAME} to the Start Menu"
 !insertmacro MUI_DESCRIPTION_TEXT ${S3} "Add a shortcut to ${APP_NAME} to the Desktop folder"
 !insertmacro MUI_DESCRIPTION_TEXT ${S4} "Run ${APP_NAME} on startup"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+!insertmacro MUI_UNFUNCTION_DESCRIPTION_BEGIN
+!insertmacro MUI_DESCRIPTION_TEXT ${S5} "Uninstall ${APP_NAME} and its core file(s)"
+!insertmacro MUI_DESCRIPTION_TEXT ${S6} "Remove notes created by the current user"
+!insertmacro MUI_UNFUNCTION_DESCRIPTION_END
