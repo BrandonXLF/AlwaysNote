@@ -10,11 +10,32 @@
 #define ID_HOTKEY 5643242
 #define WM_ICON_NOTIFY 34592
 
-const wchar_t CLASS_NAME[] = L"AlwaysNoteIconWindow";
-const wchar_t TOOLTIP[] = L"AlwaysNote\nWin + Shift + A";
+const WCHAR CLASS_NAME[] = L"AlwaysNoteIconWindow";
+const WCHAR TOOLTIP[] = L"AlwaysNote\nWin + Shift + A";
+const WCHAR NOTEPAD_EXE[] = L"AlwaysNoteNotepad.exe";
 
 NOTIFYICONDATA iconData;
 HANDLE alwaysNoteProcess;
+
+LPWSTR GetNotepadPath() {
+    LPWSTR currentPath = NULL;
+    DWORD nextSize = MAX_PATH;
+
+    do {
+        currentPath = realloc(currentPath, sizeof(WCHAR) * nextSize);
+        GetModuleFileName(0, currentPath, nextSize);
+        nextSize *= 2;
+    } while (GetLastError() == ERROR_INSUFFICIENT_BUFFER);
+
+    size_t dirPathLen = wcsrchr(currentPath, '\\') - currentPath + 1;
+    LPWSTR notepadPath = malloc(sizeof(WCHAR) * dirPathLen + sizeof(NOTEPAD_EXE));
+
+    memcpy(notepadPath, currentPath, sizeof(WCHAR) * dirPathLen);
+    memcpy(notepadPath + dirPathLen, NOTEPAD_EXE, sizeof(NOTEPAD_EXE));
+    free(currentPath);
+
+    return notepadPath;
+}
 
 void CreateNotepad(BOOL toggle) {
     if (alwaysNoteProcess && WaitForSingleObject(alwaysNoteProcess, 0) != WAIT_OBJECT_0) {
@@ -24,6 +45,8 @@ void CreateNotepad(BOOL toggle) {
         return;
     }
 
+    LPWSTR notepadPath = GetNotepadPath();
+
     STARTUPINFO si;
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
@@ -31,61 +54,62 @@ void CreateNotepad(BOOL toggle) {
     PROCESS_INFORMATION pi;
     ZeroMemory(&pi, sizeof(pi));
 
-    CreateProcess(NULL, _tcsdup(L"AlwaysNoteNotepad.exe"), NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi);
-
+    CreateProcess(notepadPath, NULL, NULL, NULL, FALSE, NULL, NULL, NULL, &si, &pi);
     alwaysNoteProcess = pi.hProcess;
+
+    free(notepadPath);
     CloseHandle(pi.hThread);
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     switch (msg) {
-        case WM_DESTROY:
-            Shell_NotifyIcon(NIM_DELETE, &iconData);
-            PostQuitMessage(0);
-            break;
-        case WM_CLOSE:
+    case WM_DESTROY:
+        Shell_NotifyIcon(NIM_DELETE, &iconData);
+        PostQuitMessage(0);
+        break;
+    case WM_CLOSE:
+        DestroyWindow(hwnd);
+        break;
+    case WM_COMMAND:
+        switch (wparam) {
+        case ID_EXIT_PROGRAM:
             DestroyWindow(hwnd);
             break;
-        case WM_COMMAND:
-            switch (wparam) {
-                case ID_EXIT_PROGRAM:
-                    DestroyWindow(hwnd);
-                    break;
-                case ID_OPEN_BIN:
-                    CreateNotepad(FALSE);
-                    break;
-            }
-
+        case ID_OPEN_BIN:
+            CreateNotepad(FALSE);
             break;
-        case WM_HOTKEY:
+        }
+
+        break;
+    case WM_HOTKEY:
+        CreateNotepad(TRUE);
+
+        break;
+    case WM_ICON_NOTIFY:
+        switch (lparam) {
+        case WM_LBUTTONUP:
             CreateNotepad(TRUE);
+            break;
+        case WM_RBUTTONUP:
+        case WM_CONTEXTMENU: {
+            POINT lpClickPoint;
+            GetCursorPos(&lpClickPoint);
+
+            HMENU hMenu = CreatePopupMenu();
+
+            AppendMenu(hMenu, MF_STRING, ID_OPEN_BIN, L"Open");
+            AppendMenu(hMenu, MF_STRING, ID_EXIT_PROGRAM, L"Exit");
+
+            SetMenuDefaultItem(hMenu, ID_OPEN_BIN, FALSE);
+            SetForegroundWindow(hwnd);
+            TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_TOPALIGN, lpClickPoint.x, lpClickPoint.y, 0, hwnd, NULL);
+            DestroyMenu(hMenu);
 
             break;
-        case WM_ICON_NOTIFY:
-            switch (lparam) {
-                case WM_LBUTTONUP:
-                    CreateNotepad(TRUE);
-                    break;
-                case WM_RBUTTONUP:
-                case WM_CONTEXTMENU: {
-                    POINT lpClickPoint;
-                    GetCursorPos(&lpClickPoint);
+        }
+        }
 
-                    HMENU hMenu = CreatePopupMenu();
-
-                    AppendMenu(hMenu, MF_STRING, ID_OPEN_BIN, L"Open");
-                    AppendMenu(hMenu, MF_STRING, ID_EXIT_PROGRAM, L"Exit");
-
-                    SetMenuDefaultItem(hMenu, ID_OPEN_BIN, FALSE);
-                    SetForegroundWindow(hwnd);
-                    TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_TOPALIGN, lpClickPoint.x, lpClickPoint.y, 0, hwnd, NULL);
-                    DestroyMenu(hMenu);
-
-                    break;
-                }
-            }
-
-            break;
+        break;
     }
 
     return DefWindowProc(hwnd, msg, wparam, lparam);
@@ -96,9 +120,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
     if (GetLastError() == ERROR_ALREADY_EXISTS)
         return 0;
-    
+
     HICON icon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(101), IMAGE_ICON, 24, 24, NULL);
-    
+
     WNDCLASS winClass;
     ZeroMemory(&winClass, sizeof(winClass));
     winClass.hInstance = hInstance;
