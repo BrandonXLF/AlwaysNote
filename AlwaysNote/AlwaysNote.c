@@ -1,5 +1,4 @@
 #include <windows.h>
-#include <tchar.h>
 
 #define ID_EMPTY_BIN 40057
 #define ID_EXIT_PROGRAM 40058
