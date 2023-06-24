@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AlwaysNote.cpp">
+    <ClCompile Include="AlwaysNote.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

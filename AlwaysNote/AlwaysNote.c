@@ -1,21 +1,22 @@
 #include <windows.h>
 #include <tchar.h>
 
-const int ID_EMPTY_BIN = 40057;
-const int ID_EXIT_PROGRAM = 40058;
-const int ID_OPEN_BIN = 40059;
-const int ID_BIN_PROPERTIES = 40060;
-const int ID_ENABLE_HIDE = 40061;
-const int ID_DISABLE_HIDE = 40062;
-const int ID_HOTKEY = 5643242;
+#define ID_EMPTY_BIN 40057
+#define ID_EXIT_PROGRAM 40058
+#define ID_OPEN_BIN 40059
+#define ID_BIN_PROPERTIES 40060
+#define ID_ENABLE_HIDE 40061
+#define ID_DISABLE_HIDE 40062
+#define ID_HOTKEY 5643242
+#define WM_ICON_NOTIFY 34592
+
 const wchar_t CLASS_NAME[] = L"AlwaysNoteIconWindow";
 const wchar_t TOOLTIP[] = L"AlwaysNote\nWin + Shift + A";
-const UINT WM_ICON_NOTIFY = 34592;
 
 NOTIFYICONDATA iconData;
 HANDLE alwaysNoteProcess;
 
-void CreateNotepad(BOOL toggle = FALSE) {
+void CreateNotepad(BOOL toggle) {
     if (alwaysNoteProcess && WaitForSingleObject(alwaysNoteProcess, 0) != WAIT_OBJECT_0) {
         if (!toggle) return;
 
@@ -51,7 +52,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
                     DestroyWindow(hwnd);
                     break;
                 case ID_OPEN_BIN:
-                    CreateNotepad();
+                    CreateNotepad(FALSE);
                     break;
             }
 
@@ -71,8 +72,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
                     GetCursorPos(&lpClickPoint);
 
                     HMENU hMenu = CreatePopupMenu();
+
                     AppendMenu(hMenu, MF_STRING, ID_OPEN_BIN, L"Open");
                     AppendMenu(hMenu, MF_STRING, ID_EXIT_PROGRAM, L"Exit");
+
                     SetMenuDefaultItem(hMenu, ID_OPEN_BIN, FALSE);
                     SetForegroundWindow(hwnd);
                     TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_TOPALIGN, lpClickPoint.x, lpClickPoint.y, 0, hwnd, NULL);
@@ -88,27 +91,25 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow) {
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow) {
     CreateMutex(NULL, TRUE, L"eb9bed52-161c-4a2f-bc0f-e50da0a7aab6");
 
-    if (GetLastError() == ERROR_ALREADY_EXISTS) {
+    if (GetLastError() == ERROR_ALREADY_EXISTS)
         return 0;
-    }
     
     HICON icon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(101), IMAGE_ICON, 24, 24, NULL);
-
-    WNDCLASS winClass = {};
-    winClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    
+    WNDCLASS winClass;
+    ZeroMemory(&winClass, sizeof(winClass));
     winClass.hInstance = hInstance;
     winClass.lpszClassName = CLASS_NAME;
-    winClass.style = CS_HREDRAW | CS_VREDRAW;
     winClass.lpfnWndProc = WindowProc;
     winClass.hIcon = icon;
     RegisterClass(&winClass);
 
     HWND hwnd = CreateWindowEx(NULL, CLASS_NAME, NULL, CW_USEDEFAULT, 0, 0, 0, 0, HWND_MESSAGE, NULL, hInstance, NULL);
 
-    memset(&iconData, 0, sizeof(iconData));
+    ZeroMemory(&iconData, sizeof(iconData));
     iconData.cbSize = sizeof(iconData);
     iconData.hIcon = icon;
     iconData.hWnd = hwnd;
@@ -119,9 +120,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
     Shell_NotifyIcon(NIM_ADD, &iconData);
 
-    if (wcspbrk(lpCmdLine, L"--minimized") == NULL) CreateNotepad();
+    if (wcspbrk(lpCmdLine, L"--minimized") == NULL)
+        CreateNotepad(FALSE);
 
-    RegisterHotKey(hwnd, ID_HOTKEY, MOD_WIN | MOD_SHIFT, 0x41); // Win + Shift + A
+    RegisterHotKey(hwnd, ID_HOTKEY, MOD_WIN | MOD_SHIFT, 'A'); // Win + Shift + A
 
     MSG msg;
 
