@@ -170,7 +170,7 @@
             </Grid>
         </Grid>
         <TextBox
-            Name="textBox"
+            Name="NoteTextBox"
             Grid.Row="1"
             AcceptsReturn="True"
             AcceptsTab="True"
@@ -184,6 +184,7 @@
             Background="{Binding Background}"
             Foreground="{Binding Foreground}"
             IsInactiveSelectionHighlightEnabled="True"
+            Loaded="TextBox_Loaded"
         />
     </Grid>
 </UserControl>

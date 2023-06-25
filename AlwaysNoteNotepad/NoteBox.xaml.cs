@@ -52,11 +52,10 @@ namespace AlwaysNote {
 
         private void FindReplace_Toggle(object sender, RoutedEventArgs e) {
             DoubleAnimation animation = new() {
-                Duration = TimeSpan.FromMilliseconds(50)
+                Duration = TimeSpan.FromMilliseconds(50),
+                From = FindReplace.Height == 0 ? 0 : FindReplace.ActualHeight,
+                To = FindReplace.Height == 0 ? FindReplace.ActualHeight : 0
             };
-
-            animation.From = FindReplace.Height == 0 ? 0 : FindReplace.ActualHeight;
-            animation.To = FindReplace.Height == 0 ? FindReplace.ActualHeight : 0;
 
             FindReplace.BeginAnimation(HeightProperty, animation);
         }
@@ -82,10 +81,10 @@ namespace AlwaysNote {
 
         private void HighlightMatch(int relIndex) {
             try {
-                MatchCollection matches = Regex.Matches(textBox.Text, FindText, RegexFlags);
+                MatchCollection matches = Regex.Matches(NoteTextBox.Text, FindText, RegexFlags);
 
                 if (matches.Count == 0) {
-                    textBox.SelectionLength = 0;
+                    NoteTextBox.SelectionLength = 0;
                     matchesStatus.Text = "";
 
                     return;
@@ -101,8 +100,8 @@ namespace AlwaysNote {
 
                 IInputElement focused = FocusManager.GetFocusedElement(FocusManager.GetFocusScope(this));
 
-                textBox.Focus();
-                textBox.Select(matches[matchCase].Index, matches[matchCase].Length);
+                NoteTextBox.Focus();
+                NoteTextBox.Select(matches[matchCase].Index, matches[matchCase].Length);
                 focused.Focus();
 
                 matchesStatus.Text = (matchCase + 1) + "/" + matches.Count;
@@ -127,12 +126,12 @@ namespace AlwaysNote {
             string eval(Match match) =>
                 counter++ == matchCase ? match.Result(ReplaceText) : match.Value;
 
-            textBox.Text = Regex.Replace(textBox.Text, FindText, eval, RegexFlags);
+            NoteTextBox.Text = Regex.Replace(NoteTextBox.Text, FindText, eval, RegexFlags);
             HighlightMatch(0);
         }
 
         private void ReplaceAll_Click(object sender, RoutedEventArgs e) {
-            textBox.Text = Regex.Replace(textBox.Text, FindText, ReplaceText, RegexFlags);
+            NoteTextBox.Text = Regex.Replace(NoteTextBox.Text, FindText, ReplaceText, RegexFlags);
         }
 
         private void FindBox_GotFocus(object sender, RoutedEventArgs e) {
@@ -147,6 +146,11 @@ namespace AlwaysNote {
             TextBlock text = FindName(source.Name + "_placeholder") as TextBlock;
 
             text.Visibility = source.Text == "" ? Visibility.Visible : Visibility.Hidden;
+        }
+
+        private void TextBox_Loaded(object sender, RoutedEventArgs e) {
+            NoteTextBox.Focus();
+            NoteTextBox.CaretIndex = NoteTextBox.Text.Length;
         }
     }
 }
