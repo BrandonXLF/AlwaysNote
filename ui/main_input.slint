@@ -1,0 +1,70 @@
+import { OptionPopup } from "option_popup.slint";
+import { ColorPalette } from "color_palette.slint";
+
+export component MainInput inherits Rectangle {
+    in-out property <string> text;
+
+    callback show-find();
+    callback edited <=> input.edited;
+
+    vertical-stretch: 1;
+    horizontal-stretch: 1;
+
+    TouchArea {
+        pointer-event(e) => {
+            if (e.button == PointerEventButton.right && e.kind == PointerEventKind.up) {
+                ctx-menu.x = self.mouse-x;
+                ctx-menu.y = self.mouse-y;
+                ctx-menu.show();
+            }
+        }
+    }
+
+    ctx-menu := OptionPopup {
+        options: ["Find", "Cut", "Copy", "Paste"];
+
+        option-chosen(option) => {
+            if (option == "Find") {
+                show-find();
+            } else if (option == "Cut") {
+                input.cut();
+            } else if (option == "Copy") {
+                input.copy();
+            } else if (option == "Paste") {
+                input.paste();
+            }
+        }
+    }
+
+    FocusScope {
+        key-pressed(e) => {
+            if (e.text == Key.Tab || e.text == Key.Escape) {
+                return reject;
+            }
+
+            if (e.modifiers.control && (e.text == "f" || e.text == "F")) {
+                show-find();
+            }
+
+            accept
+        }
+
+        Flickable {
+            viewport-height: input.preferred-height + 8px;
+
+            input := TextInput {
+                y: 4px;
+                width: parent.width - 8px;
+                min-height: root.height - 8px;
+                text <=> root.text;
+                single-line: false;
+                wrap: word-wrap;
+                color: ColorPalette.opposite;
+
+                init => {
+                    self.focus();
+                }
+            }
+        }
+    }
+}

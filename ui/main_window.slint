@@ -1,0 +1,153 @@
+import { FindReplace, FindReplaceAdapter } from "find_replace.slint";
+import { InlineButton } from "inline_button.slint";
+import { NamePrompt } from "name_prompt.slint";
+import { DeletePrompt } from "delete_prompt.slint";
+import { OptionPopup } from "option_popup.slint";
+import { ColorPalette } from "color_palette.slint";
+import { MainInput } from "main_input.slint";
+
+export { FindReplaceAdapter, ColorPalette }
+
+export global NoteStoreAdapter {
+    pure callback get-text(string) -> string;
+    callback set-text(string, string);
+    callback set-current(string);
+}
+
+export component MainWindow inherits Window {
+    in-out property <[string]> note-names;
+    out property <string> current-note;
+    out property <string> text;
+
+    callback close <=> close-button.clicked;
+    callback mouse-move(length, length);
+    callback set-current-note(string);
+    callback set-text(string);
+    callback rename <=> name-prompt.rename;
+    callback delete <=> delete-prompt.delete;
+
+    function close-prompts() {
+        delete-prompt.shown = false;
+        name-prompt.shown = false;
+        find-prompt.shown = false;
+    }
+
+    no-frame: true;
+    background: #0000;
+    always-on-top: true;
+    width: 250px;
+    height: 250px;
+
+    set-current-note(note) => {
+        current-note = note;
+        set-text(NoteStoreAdapter.get-text(note));
+        NoteStoreAdapter.set-current(note);
+    }
+
+    set-text(new-text) => {
+        text = new-text;
+        FindReplaceAdapter.text-edited();
+        NoteStoreAdapter.set-text(current-note, new-text);
+    }
+
+    Rectangle {
+        background: ColorPalette.translucent;
+    }
+
+    FocusScope {  
+        key-pressed(e) => {
+            if (e.text == Key.Tab) {
+                return reject;
+            }
+
+            if (e.text == Key.Escape) {
+                close-prompts();
+            }
+
+            accept
+        }
+
+        VerticalLayout {
+            TouchArea {
+                moved => {
+                    mouse-move(
+                        self.mouse-x - self.pressed-x,
+                        self.mouse-y - self.pressed-y
+                    );
+                }
+
+                select-popup := OptionPopup {
+                    x: 0;
+                    y: note-button.height;
+
+                    options: note-names;
+                    extras: ["Add new"];
+                    actions: ["Rename", "Delete"];
+                    
+                    option-chosen(chosen-name) => {
+                        set-current-note(chosen-name);
+                    }
+
+                    extra-chosen => {
+                        close-prompts();
+                        name-prompt.set-old-name("");
+                        name-prompt.shown = true;
+                    }
+
+                    action-clicked(action, name) => {
+                        close-prompts();
+
+                        if (action == "Rename") {
+                            name-prompt.set-old-name(name);
+                            name-prompt.shown = true;
+                        } else if (action == "Delete") {
+                            delete-prompt.target = name;
+                            delete-prompt.shown = true;
+                        }
+                    }
+                }
+
+                Rectangle {
+                    background: ColorPalette.accent;
+
+                    HorizontalLayout {
+                        alignment: LayoutAlignment.space-between;
+
+                        note-button := InlineButton {
+                            text: current-note + " ▼";
+                            text-color: ColorPalette.contrast;
+                            clicked => {
+                                select-popup.show();
+                            }
+                        }
+
+                        close-button := InlineButton {
+                            text: "🗙";
+                            text-color: ColorPalette.contrast;
+                            accessible-label: "Close";
+                            font-size: 1.15rem;
+                            vertical-offset: -3px;
+                        }
+                    }
+                }
+            }
+            
+            name-prompt := NamePrompt {}
+            delete-prompt := DeletePrompt {}
+            find-prompt := FindReplace {}
+            
+            MainInput {
+                text <=> root.text;
+
+                show-find => {
+                    close-prompts();
+                    find-prompt.shown = true;
+                }
+
+                edited => {
+                    set-text(root.text);
+                }
+            }
+        }
+    }
+}

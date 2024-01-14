@@ -1,9 +1,10 @@
 !define APP_NAME "AlwaysNote"
+!define EXE_NAME "always_note.exe"
 !define REG_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"
 
 Name "${APP_NAME}"
 BrandingText " "
-OutFile "out\${APP_NAME} Installer.exe"
+OutFile "target\${APP_NAME} Installer.exe"
 Unicode True
 
 !define MULTIUSER_MUI
@@ -20,7 +21,7 @@ Unicode True
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_ICON "images\icon.ico"
 !define MUI_UNICON "images\icon.ico"
-!define MUI_FINISHPAGE_RUN "$INSTDIR\${APP_NAME}.exe"
+!define MUI_FINISHPAGE_RUN "$INSTDIR\${EXE_NAME}"
 !define MUI_FINISHPAGE_RUN_TEXT "Launch ${APP_NAME}"
 
 !include MultiUser.nsh
@@ -51,7 +52,7 @@ FunctionEnd
 Section "${APP_NAME}" S1
 	SectionIn RO
 	SetOutPath $INSTDIR
-	File /x *.pdb out\Release\*.*
+	File target\release\always_note.exe
 	WriteUninstaller "$INSTDIR\${APP_NAME} Uninstaller.exe"
 	WriteRegStr SHCTX "${REG_KEY}" "DisplayName" "${APP_NAME}"
 	WriteRegStr SHCTX "${REG_KEY}" "InstallLocation" "$INSTDIR"
@@ -59,19 +60,19 @@ Section "${APP_NAME}" S1
 	WriteRegDWORD SHCTX "${REG_KEY}" "NoModify" "1"
 	WriteRegDWORD SHCTX "${REG_KEY}" "NoRepair" "1"
 	WriteRegStr SHCTX "${REG_KEY}" "UninstallString" '"$INSTDIR\${APP_NAME} Uninstaller.exe"'
-	WriteRegStr SHCTX "${REG_KEY}" "DisplayIcon" "$INSTDIR\${APP_NAME}.exe"
+	WriteRegStr SHCTX "${REG_KEY}" "DisplayIcon" "$INSTDIR\${EXE_NAME}"
 SectionEnd
 
 Section "Add To Start Menu" S2
-	CreateShortcut "$SMPROGRAMS\${APP_NAME}.lnk" "$INSTDIR\${APP_NAME}.exe"
+	CreateShortcut "$SMPROGRAMS\${APP_NAME}.lnk" "$INSTDIR\${EXE_NAME}"
 SectionEnd
 
 Section "Create Desktop Shortcut" S3
-	CreateShortcut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\${APP_NAME}.exe"
+	CreateShortcut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\${EXE_NAME}"
 SectionEnd
 
 Section "Run On Startup" S4
-	CreateShortcut "$SMSTARTUP\${APP_NAME}.lnk" "$INSTDIR\${APP_NAME}.exe" --minimized
+	CreateShortcut "$SMSTARTUP\${APP_NAME}.lnk" "$INSTDIR\${EXE_NAME}" --minimized
 SectionEnd
 
 Section "Uninstall" S5

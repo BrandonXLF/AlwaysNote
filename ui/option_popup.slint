@@ -1,0 +1,84 @@
+import { InlineButton } from "inline_button.slint";
+import { ColorPalette } from "color_palette.slint";
+
+export component OptionPopup {
+    in-out property <[string]> options: [];
+    in-out property <[string]> extras: [];
+    in-out property <[string]> actions: [];
+
+    callback option-chosen(string);
+    callback extra-chosen(string);
+    callback action-clicked(string, string);
+
+    public function show() {
+        popup.show();
+    }
+
+    popup := PopupWindow {
+        close-on-click: false;
+
+        layout := HorizontalLayout {
+            main-content := Rectangle {
+                width: self.preferred-width;
+                height: self.preferred-height;
+                background: ColorPalette.milder;
+                border-color: ColorPalette.border;
+                border-width: 1px;
+
+                VerticalLayout {
+                    for option in options: btn := InlineButton {
+                        text: option;
+                        text-color: ColorPalette.opposite;
+
+                        clicked => {
+                            option-chosen(option);
+                            popup.close();
+                        }
+
+                        right-click => {
+                            item-ctx-menu.x = btn.width;
+                            item-ctx-menu.y = btn.y;
+                            item-ctx-menu.visible = true;
+                            item-ctx-menu.option = option;
+                        }
+                    }
+
+                    if extras.length > 0: Rectangle {
+                        width: 100%;
+                        height: 1px;
+                        background: ColorPalette.border;
+                    }
+
+                    for extra in extras: InlineButton {
+                        text: extra;
+                        text-color: ColorPalette.opposite;
+                        clicked => {
+                            extra-chosen(extra);
+                            popup.close();
+                        }
+                    }
+                }
+            }
+
+            item-ctx-menu := Rectangle {
+                width: self.preferred-width;
+                height: self.preferred-height;
+                background: ColorPalette.milder;
+                visible: false;
+    
+                property <string> option;
+        
+                VerticalLayout {
+                    for action in actions: InlineButton {
+                        text: action;
+        
+                        clicked => {
+                            action-clicked(action, option);
+                            popup.close();
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

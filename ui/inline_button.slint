@@ -1,0 +1,58 @@
+import { ColorPalette } from "color_palette.slint";
+
+export component InlineButton inherits Rectangle {
+    in property <string> text;
+    in property <brush> text-color;
+    in property <length> font-size: 1rem;
+    in property <length> vertical-offset: 0px;
+
+    callback clicked <=> touch.clicked;
+    callback right-click;
+
+    accessible-role: button;
+
+    if focus-scope.has-focus: Rectangle {
+        border-color: ColorPalette.opposite;
+        border-width: 1px;
+    }
+
+    touch := TouchArea {
+        mouse-cursor: MouseCursor.pointer;
+
+        pointer-event(e) => {
+            if (e.button == PointerEventButton.right && e.kind == PointerEventKind.up) {
+                right-click();
+            }
+        }
+    }
+
+    HorizontalLayout {
+        padding: 4px;
+        padding-top: 4px + vertical-offset;
+
+        Text {
+            text <=> root.text;
+            font-size: root.font-size;
+
+            states [
+                colored when text-color != #0000 : {
+                    color: text-color;
+                }
+            ]
+        }
+    }
+
+    focus-scope := FocusScope {
+        x: 0;
+        width: 0;
+
+        key-pressed(event) => {
+            if (event.text == " " || event.text == "\n") {
+                touch.clicked();
+                return accept;
+            }
+
+            return reject;
+        }
+    }
+}

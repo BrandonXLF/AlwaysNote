@@ -1,0 +1,39 @@
+import { InlineButton } from "inline_button.slint";
+import { InlineInput } from "inline_input.slint";
+import { ColorPalette } from "color_palette.slint";
+import { Prompt } from "prompt.slint";
+
+export component DeletePrompt inherits Prompt {
+    in-out property <string> target;
+
+    callback delete(string);
+
+    VerticalLayout {
+        padding: 4px;
+        spacing: 4px;
+
+        Text {
+            text: "Are you sure you want to delete \"" + target + "\"?";
+        }
+
+        HorizontalLayout {
+            alignment: LayoutAlignment.space-around;
+            spacing: 4px;
+
+            InlineButton {
+                text: "Yes";
+                clicked => {
+                    delete(target);
+                    root.shown = false;
+                }
+            }
+
+            InlineButton {
+                text: "No";
+                clicked => {
+                    root.shown = false;
+                }
+            }
+        }
+    }
+}

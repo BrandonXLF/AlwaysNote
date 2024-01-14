@@ -1,0 +1,10 @@
+export global ColorPalette {
+    in-out property <brush> accent;
+    in-out property <brush> contrast;
+    in-out property <brush> theme;
+    in-out property <brush> opposite;
+
+    out property <brush> translucent: theme.with-alpha(0.96);
+    out property <brush> milder: theme.mix(#666, 0.7);
+    out property <brush> border: theme.mix(#666, 0.4);
+}
