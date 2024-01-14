@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net6.0-windows10.0.18362.0</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<UseWindowsForms>True</UseWindowsForms>
+		<RootNamespace>AlwaysNote</RootNamespace>
+		<ApplicationIcon>..\images\icon.ico</ApplicationIcon>
+		<PublishTrimmed>false</PublishTrimmed>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+		<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+		<SignAssembly>False</SignAssembly>
+		<PublishSingleFile>True</PublishSingleFile>
+		<SelfContained>False</SelfContained>
+		<OutputType>WinExe</OutputType>
+		<PlatformTarget>x64</PlatformTarget>
+		<BaseOutputPath>..\out</BaseOutputPath>
+	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="Resources\**" />
+	  <EmbeddedResource Remove="Resources\**" />
+	  <None Remove="Resources\**" />
+	  <Page Remove="Resources\**" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="icon.ico" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.DotNet.ILCompiler" Version="7.0.0-preview.3.22175.4" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Resource Include="icon.ico" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Update="Resources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Resources.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Update="Resources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+	  <PrivateSdkAssemblies Remove="Resources\**" />
+	</ItemGroup>
+	<ItemGroup>
+	  <FrameworkAssemblies Remove="Resources\**" />
+	</ItemGroup>
+</Project>
