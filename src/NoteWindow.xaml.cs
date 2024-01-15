@@ -13,6 +13,14 @@ namespace AlwaysNote {
             return Color.FromArgb(color.A, color.R, color.G, color.B);
         }
 
+        public void Toggle() {
+            if (IsVisible) {
+                Hide();
+            } else {
+                Show();
+            }
+        }
+
         public NoteWindow() {
             InitializeComponent();
 
@@ -54,7 +62,7 @@ namespace AlwaysNote {
 
         private void Close_Click(object sender, RoutedEventArgs e) {
             e.Handled = true;
-            Close();
+            Hide();
         }
 
         private void NoteTitle_Click(object sender, RoutedEventArgs e) {
