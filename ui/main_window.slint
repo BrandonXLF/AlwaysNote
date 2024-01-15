@@ -33,7 +33,7 @@ export component MainWindow inherits Window {
     }
 
     no-frame: true;
-    background: #0000;
+    background: ColorPalette.translucent;
     always-on-top: true;
     width: 250px;
     height: 250px;
@@ -48,10 +48,6 @@ export component MainWindow inherits Window {
         text = new-text;
         FindReplaceAdapter.text-edited();
         NoteStoreAdapter.set-text(current-note, new-text);
-    }
-
-    Rectangle {
-        background: ColorPalette.translucent;
     }
 
     FocusScope {  
