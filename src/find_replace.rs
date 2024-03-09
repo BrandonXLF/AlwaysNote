@@ -57,7 +57,13 @@ pub fn init(win: &MainWindow) {
 
             let mut haystack: String = win.get_text().into();
             let matches: Vec<(usize, &str)> = haystack.match_indices(find.as_str()).collect();
-            let start = matches[adapter.get_current_index() as usize];
+            let index = adapter.get_current_index() as usize;
+
+            if index >= matches.len() {
+                return;
+            }
+
+            let start = matches[index];
             let offset = start.0;
 
             haystack.replace_range(offset..(offset + start.1.len()), replace.as_str());
