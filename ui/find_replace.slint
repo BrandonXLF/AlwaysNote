@@ -88,6 +88,8 @@ export component FindReplace inherits Prompt {
     find-status := Text {
         x: find-input.x + find-input.width - find-status.preferred-width;
         y: find-input.y + find-status.preferred-height / 2 + 1px;
-        text: (FindReplaceAdapter.current-index + 1) + "/" + FindReplaceAdapter.match-count;
+        text: (FindReplaceAdapter.current-index + (FindReplaceAdapter.match-count == 0 ? 0 : 1))
+            + "/"
+            + FindReplaceAdapter.match-count;
     }
 }
