@@ -6,7 +6,6 @@ edition = "2021"
 [dependencies]
 crossbeam-channel = "0.5.12"
 dirs = "5.0.1"
-i-slint-backend-selector = "1.4.1"
 i-slint-backend-winit = "1.4.1"
 slint = { version = "1.4.1", default-features = false , features = [ "std", "compat-1-2", "backend-winit", "renderer-skia" ] }
 trayicon = { version = "0.1.3", features = [ "crossbeam-channel" ] }

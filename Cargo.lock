@@ -58,7 +58,6 @@ version = "2.0.0"
 dependencies = [
  "crossbeam-channel",
  "dirs",
- "i-slint-backend-selector",
  "i-slint-backend-winit",
  "slint",
  "slint-build",
