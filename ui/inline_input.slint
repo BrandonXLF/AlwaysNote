@@ -1,0 +1,69 @@
+import { ColorPalette } from "color_palette.slint";
+import { OptionPopup } from "option_popup.slint";
+
+export component InlineInput inherits Rectangle {
+    in-out property <string> text <=> input.text;
+    in-out property <string> placeholder: "";
+    
+    callback edited <=> input.edited;
+
+    accessible-role: button;
+    horizontal-stretch: 1;
+
+    ref-rect := Rectangle {}
+
+    Rectangle {
+        max-width: ref-rect.width;
+        background: ColorPalette.theme;
+        border-color: ColorPalette.border;
+        border-width: 1px;
+
+        if input.has-focus: Rectangle {
+            border-color: ColorPalette.opposite;
+            border-width: 1px;
+        }
+
+        if placeholder != "" && text == "": HorizontalLayout {
+            padding: 4px;
+
+            Text {
+                text <=> placeholder;
+            }
+        }
+
+        input-ctx := OptionPopup {
+            options: ["Cut", "Copy", "Paste"];
+
+            option-chosen(option) => {
+                if (option == "Cut") {
+                    input.cut();
+                } else if (option == "Copy") {
+                    input.copy();
+                } else if (option == "Paste") {
+                    input.paste();
+                }
+            }
+        }
+
+        TouchArea {
+            vertical-stretch: 1;
+            horizontal-stretch: 1;
+
+            pointer-event(e) => {
+                if (e.button == PointerEventButton.right && e.kind == PointerEventKind.up) {
+                    input-ctx.x = self.mouse-x;
+                    input-ctx.y = self.mouse-y;
+                    input-ctx.show();
+                }
+            }
+        }
+
+        HorizontalLayout {
+            padding: 4px;
+
+            input := TextInput {
+                single-line: true;
+            }
+        }
+    }
+}

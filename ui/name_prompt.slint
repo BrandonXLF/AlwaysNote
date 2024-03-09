@@ -1,0 +1,54 @@
+import { InlineButton } from "inline_button.slint";
+import { InlineInput } from "inline_input.slint";
+import { ColorPalette } from "color_palette.slint";
+import { Prompt } from "prompt.slint";
+
+export component NamePrompt inherits Prompt {
+    in-out property <string> old-name;
+
+    callback rename(string, string);
+
+    public function set-old-name(old-name: string) {
+        self.old-name = old-name;
+        input.text = old-name;
+    }
+
+    VerticalLayout {
+        padding: 4px;
+        spacing: 4px;
+
+        Text {
+            text: "Enter name:";
+        }
+
+        input := InlineInput {}
+
+        HorizontalLayout {
+            alignment: LayoutAlignment.space-around;
+            spacing: 4px;
+
+            if old-name == "": InlineButton {
+                text: "Create";
+                clicked => {
+                    rename(old-name, input.text);
+                    root.shown = false;
+                }
+            }
+
+            if old-name != "": InlineButton {
+                text: "Rename";
+                clicked => {
+                    rename(old-name, input.text);
+                    root.shown = false;
+                }
+            }
+
+            InlineButton {
+                text: "Cancel";
+                clicked => {
+                    root.shown = false;
+                }
+            }
+        }
+    }
+}
