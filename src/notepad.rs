@@ -6,7 +6,7 @@ use crate::{
     store_adapter,
     ui::*,
 };
-use i_slint_backend_winit::{WinitWindowAccessor, winit::platform::windows::WindowExtWindows};
+use i_slint_backend_winit::{winit::platform::windows::WindowExtWindows, WinitWindowAccessor};
 
 #[derive(Clone)]
 pub struct NotepadManager {
@@ -53,7 +53,9 @@ impl NotepadManager {
         win.invoke_set_current_note(NoteStore::get_current_note().into());
 
         (
-            NotepadManager { win_weak: win.as_weak() },
+            NotepadManager {
+                win_weak: win.as_weak(),
+            },
             win,
             color_holder,
         )
