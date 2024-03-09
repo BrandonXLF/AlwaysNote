@@ -30,12 +30,5 @@ fn main() {
         }
     }
 
-    // TODO: workaround for https://github.com/slint-ui/slint/issues/1499
-    i_slint_backend_selector::with_platform(|b| {
-        b.set_event_loop_quit_on_last_window_closed(false);
-        Ok(())
-    })
-    .unwrap();
-
-    slint::run_event_loop().unwrap();
+    slint::run_event_loop_until_quit().unwrap();
 }
