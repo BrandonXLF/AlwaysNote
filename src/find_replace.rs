@@ -118,6 +118,12 @@ pub fn init(win: &MainWindow) {
 
             adapter.set_current_index(0);
             adapter.set_match_count(matches.len() as i32);
+
+            select(
+                &win,
+                matches.first().map_or(0, |res| res.0),
+                matches.first().map_or(0, |res| res.1.len()),
+            );
         }
     });
 }
