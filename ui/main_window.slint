@@ -50,7 +50,7 @@ export component MainWindow inherits Window {
 
     set-text(new-text) => {
         text = new-text;
-        FindReplaceAdapter.text-edited();
+        FindReplaceAdapter.text-edited(text);
         NoteStoreAdapter.set-text(current-note, new-text);
     }
 

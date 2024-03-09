@@ -10,6 +10,11 @@ fn change_index(win: &MainWindow, change: i32) {
     let i = adapter.get_current_index();
     let count = adapter.get_match_count();
 
+    if count == 0 {
+        adapter.set_current_index(0);
+        return;
+    }
+
     let new_i = if count == 0 {
         0
     } else {
@@ -68,8 +73,6 @@ pub fn init(win: &MainWindow) {
 
             haystack.replace_range(offset..(offset + start.1.len()), replace.as_str());
             win.invoke_set_text(haystack.into());
-
-            select(&win, offset, replace.len());
         }
     });
 
@@ -91,14 +94,15 @@ pub fn init(win: &MainWindow) {
     adapter.on_text_edited({
         let win_weak = win.as_weak();
 
-        move || {
+        move |haystack| {
             let win = win_weak.unwrap();
             let adapter = win.global::<FindReplaceAdapter>();
-            let find = adapter.get_find_text();
 
-            if find.len() > 0 {
-                adapter.invoke_find_edited(find);
-            }
+            let needle = adapter.get_find_text();
+            let matches: Vec<(usize, &str)> = haystack.match_indices(needle.as_str()).collect();
+
+            adapter.set_match_count(matches.len() as i32);
+            change_index(&win, 0);
         }
     });
 
