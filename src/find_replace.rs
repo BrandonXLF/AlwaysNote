@@ -1,5 +1,9 @@
 use crate::ui::*;
 
+fn select(win: &MainWindow, start: usize, length: usize) {
+    win.invoke_set_selection_offsets(start as i32, (start + length) as i32);
+}
+
 fn change_index(win: &MainWindow, change: i32) {
     let adapter = win.global::<FindReplaceAdapter>();
 
@@ -19,7 +23,7 @@ fn change_index(win: &MainWindow, change: i32) {
     let matches: Vec<(usize, &str)> = haystack.match_indices(find.as_str()).collect();
     let start = matches[new_i as usize];
 
-    println!("{} {} {}", start.0, start.1, start.1.len());
+    select(win, start.0, start.1.len());
 }
 
 pub fn init(win: &MainWindow) {
@@ -54,9 +58,12 @@ pub fn init(win: &MainWindow) {
             let mut haystack: String = win.get_text().into();
             let matches: Vec<(usize, &str)> = haystack.match_indices(find.as_str()).collect();
             let start = matches[adapter.get_current_index() as usize];
+            let offset = start.0;
 
-            haystack.replace_range(start.0..start.0 + start.1.len(), replace.as_str());
+            haystack.replace_range(offset..(offset + start.1.len()), replace.as_str());
             win.invoke_set_text(haystack.into());
+
+            select(&win, offset, replace.len());
         }
     });
 

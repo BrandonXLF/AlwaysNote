@@ -25,7 +25,11 @@ export component MainWindow inherits Window {
     callback set-text(string);
     callback rename <=> name-prompt.rename;
     callback delete <=> delete-prompt.delete;
-
+    
+    public function set-selection-offsets(start: int, end: int) {
+        main-input.set-selection-offsets(start, end);
+    }
+    
     function close-prompts() {
         delete-prompt.shown = false;
         name-prompt.shown = false;
@@ -132,7 +136,7 @@ export component MainWindow inherits Window {
             delete-prompt := DeletePrompt {}
             find-prompt := FindReplace {}
             
-            MainInput {
+            main-input := MainInput {
                 text <=> root.text;
 
                 show-find => {
