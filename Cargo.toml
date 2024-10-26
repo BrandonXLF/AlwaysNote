@@ -8,8 +8,8 @@ crossbeam-channel = "0.5.12"
 dirs = "5.0.1"
 i-slint-backend-winit = "1.4.1"
 slint = { version = "1.4.1", default-features = false, features = [ "accessibility", "backend-winit", "compat-1-2", "std", "renderer-femtovg" ] }
-trayicon = { version = "0.1.3", features = [ "crossbeam-channel" ] }
-windows = { version = "0.54.0", "features" = [ "Foundation", "UI_ViewManagement" ] }
+trayicon = { version = "0.2.0" }
+windows = { version = "0.58.0", "features" = [ "Foundation", "UI_ViewManagement" ] }
 windows-hotkeys = "0.2.1"
 
 [build-dependencies]
