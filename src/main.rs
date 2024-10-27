@@ -22,8 +22,7 @@ fn main() {
 
     {
         let args: Vec<String> = env::args().collect();
-        let empty_string = "".into();
-        let switch = args.get(1).unwrap_or(&empty_string);
+        let switch: &str = args.get(1).map_or("", |x| x.as_str());
 
         if switch != "--minimized" {
             notepad_manager.ensure();
