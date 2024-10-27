@@ -9,23 +9,26 @@ mod notepad;
 mod store_adapter;
 mod tray_icon;
 mod ui;
+mod win_manipulator;
 
 use std::env;
 
-use notepad::NotepadManager;
+use notepad::Notepad;
+use slint::ComponentHandle;
+use win_manipulator::WindowManipulator;
 
 fn main() {
-    let (notepad_manager, _win, _color_holder) = NotepadManager::new();
+    let notepad= Notepad::new();
 
-    hotkey::add(notepad_manager.clone());
-    tray_icon::show(notepad_manager.clone());
+    hotkey::add(notepad.win.as_weak());
+    tray_icon::show(notepad.win.as_weak());
 
     {
         let args: Vec<String> = env::args().collect();
         let switch: &str = args.get(1).map_or("", |x| x.as_str());
 
         if switch != "--minimized" {
-            notepad_manager.ensure();
+            notepad.win.ensure();
         }
     }
 

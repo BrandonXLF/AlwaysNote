@@ -5,14 +5,14 @@ use windows_hotkeys::{
     HotkeyManager, HotkeyManagerImpl,
 };
 
-use crate::notepad::NotepadManager;
+use crate::{win_manipulator::WindowManipulator, ui::*};
 
-pub fn add(notepad_manager: NotepadManager) {
+pub fn add(win_weak: slint::Weak<MainWindow>) {
     thread::spawn(|| {
         let mut hkm = HotkeyManager::new();
 
         hkm.register(VKey::A, &[ModKey::Win, ModKey::Shift], move || {
-            notepad_manager.toggle();
+            win_weak.toggle();
         })
         .unwrap();
 

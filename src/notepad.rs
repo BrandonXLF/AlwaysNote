@@ -9,13 +9,13 @@ use crate::{
 use i_slint_backend_winit::{winit::platform::windows::WindowExtWindows, WinitWindowAccessor};
 use i_slint_core::items::{TextHorizontalAlignment, TextVerticalAlignment};
 
-#[derive(Clone)]
-pub struct NotepadManager {
-    pub win_weak: slint::Weak<MainWindow>,
+pub struct Notepad {
+    pub win: MainWindow,
+    _color_holder: ColorValueEventHolder,
 }
 
-impl NotepadManager {
-    pub fn new() -> (NotepadManager, MainWindow, ColorValueEventHolder) {
+impl Notepad {
+    pub fn new() -> Notepad {
         let win = MainWindow::new().unwrap();
 
         win.on_move_window({
@@ -95,28 +95,6 @@ impl NotepadManager {
         win.set_note_names(NoteModel::rc_from_saved(&win).into());
         win.invoke_set_current_note(NoteStore::get_current_note().into());
 
-        (
-            NotepadManager {
-                win_weak: win.as_weak(),
-            },
-            win,
-            color_holder,
-        )
-    }
-
-    pub fn ensure(&self) {
-        let _ = self.win_weak.upgrade_in_event_loop(move |win| {
-            win.show().unwrap();
-        });
-    }
-
-    pub fn toggle(&self) {
-        let _ = self.win_weak.upgrade_in_event_loop(move |win| {
-            if win.window().is_visible() {
-                win.hide().unwrap();
-            } else {
-                win.show().unwrap();
-            }
-        });
+        Notepad { win, _color_holder: color_holder }
     }
 }
