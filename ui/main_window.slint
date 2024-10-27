@@ -5,6 +5,7 @@ import { DeletePrompt } from "delete_prompt.slint";
 import { OptionPopup } from "option_popup.slint";
 import { ColorPalette } from "color_palette.slint";
 import { MainInput } from "main_input.slint";
+import { BorderlessWindow } from "borderless_window.slint";
 
 export { FindReplaceAdapter, ColorPalette }
 
@@ -14,7 +15,7 @@ export global NoteStoreAdapter {
     callback set-current(string);
 }
 
-export component MainWindow inherits Window {
+export component MainWindow inherits BorderlessWindow {
     in-out property <[string]> note-names;
     out property <string> current-note;
     out property <string> text;
@@ -25,6 +26,7 @@ export component MainWindow inherits Window {
     callback set-text(string);
     callback rename <=> name-prompt.rename;
     callback delete <=> delete-prompt.delete;
+    callback move-window(TextHorizontalAlignment, length, TextVerticalAlignment, length);
     
     public function set-selection-offsets(start: int, end: int) {
         main-input.set-selection-offsets(start, end);
@@ -35,12 +37,6 @@ export component MainWindow inherits Window {
         name-prompt.shown = false;
         find-prompt.shown = false;
     }
-
-    no-frame: true;
-    background: ColorPalette.translucent;
-    always-on-top: true;
-    width: 250px;
-    height: 250px;
 
     set-current-note(note) => {
         current-note = note;
@@ -54,7 +50,11 @@ export component MainWindow inherits Window {
         NoteStoreAdapter.set-text(current-note, new-text);
     }
 
-    FocusScope {  
+    move(hoz-pos, dx, vert-pos, dy) => {
+        move-window(hoz-pos, dx, vert-pos, dy);
+    }
+
+    FocusScope {
         key-pressed(e) => {
             if (e.text == Key.Tab) {
                 return reject;

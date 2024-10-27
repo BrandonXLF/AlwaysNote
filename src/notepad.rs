@@ -7,6 +7,7 @@ use crate::{
     ui::*,
 };
 use i_slint_backend_winit::{winit::platform::windows::WindowExtWindows, WinitWindowAccessor};
+use i_slint_core::items::{TextHorizontalAlignment, TextVerticalAlignment};
 
 #[derive(Clone)]
 pub struct NotepadManager {
@@ -16,6 +17,48 @@ pub struct NotepadManager {
 impl NotepadManager {
     pub fn new() -> (NotepadManager, MainWindow, ColorValueEventHolder) {
         let win = MainWindow::new().unwrap();
+
+        win.on_move_window({
+            let win_weak = win.as_weak();
+
+            move |hoz_pos, mut dx, vert_pos, mut dy| {
+                let win = win_weak.unwrap();
+                let sys_win = win.window();
+
+                if hoz_pos == TextHorizontalAlignment::Left || vert_pos == TextVerticalAlignment::Top {
+                    let logical_pos = sys_win
+                        .position()
+                        .to_logical(win_weak.unwrap().window().scale_factor());
+
+                    let mut pos_x = logical_pos.x;
+                    let mut pos_y = logical_pos.y;
+
+                    if hoz_pos == TextHorizontalAlignment::Left {
+                        pos_x += dx;
+                        dx = -dx;
+                    }
+
+                    if vert_pos == TextVerticalAlignment::Top {
+                        pos_y += dy;
+                        dy = -dy;
+                    }
+
+                    sys_win.set_position(slint::LogicalPosition::new(
+                        pos_x,
+                        pos_y,
+                    ));
+                }
+
+                let logical_size = sys_win
+                    .size()
+                    .to_logical(win_weak.unwrap().window().scale_factor());
+
+                sys_win.set_size(slint::LogicalSize::new(
+                    logical_size.width + dx,
+                    logical_size.height + dy,
+                ));
+            }
+        });
 
         win.on_close({
             let win_weak = win.as_weak();

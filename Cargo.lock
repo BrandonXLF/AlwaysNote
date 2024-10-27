@@ -155,6 +155,7 @@ dependencies = [
  "crossbeam-channel",
  "dirs",
  "i-slint-backend-winit",
+ "i-slint-core",
  "slint",
  "slint-build",
  "trayicon",

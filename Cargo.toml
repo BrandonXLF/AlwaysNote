@@ -7,6 +7,7 @@ edition = "2021"
 crossbeam-channel = "0.5.12"
 dirs = "5.0.1"
 i-slint-backend-winit = "1.4.1"
+i-slint-core = "1.8.0"
 slint = { version = "1.4.1", default-features = false, features = [ "accessibility", "backend-winit", "compat-1-2", "std", "renderer-femtovg" ] }
 trayicon = { version = "0.2.0" }
 windows = { version = "0.58.0", "features" = [ "Foundation", "UI_ViewManagement" ] }
