@@ -15,7 +15,18 @@ export component OptionPopup {
     }
 
     popup := PopupWindow {
-        close-on-click: false;
+        close-policy: close-on-click-outside;
+
+        Rectangle {
+            width: popup.width;
+            height: popup.height;
+
+            TouchArea {       
+                clicked() => {
+                    popup.close();
+                }
+            }
+        }
 
         layout := HorizontalLayout {
             main-content := Rectangle {
