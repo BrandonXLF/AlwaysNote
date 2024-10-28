@@ -16,10 +16,18 @@ export component BorderlessWindow inherits Window {
     preferred-width: 250px;
     preferred-height: 250px;
 
+	Rectangle {
+		Rectangle {
+			width: parent.width;
+			height: parent.height;
+
+			@children
+		}
+	}
+
 	GridLayout {
 		Row {
 			Rectangle {
-				background: red;
 				width: 3px;
 				height: 3px;
 	
@@ -38,7 +46,6 @@ export component BorderlessWindow inherits Window {
 			}
 
 			Rectangle {
-				background: red;
 				height: 3px;
 	
 				TouchArea {
@@ -56,7 +63,6 @@ export component BorderlessWindow inherits Window {
 			}
 
 			Rectangle {
-				background: red;
 				width: 3px;
 				height: 3px;
 	
@@ -77,7 +83,6 @@ export component BorderlessWindow inherits Window {
 
 		Row {
 			Rectangle {
-				background: red;
 				width: 3px;
 	
 				TouchArea {
@@ -94,15 +99,9 @@ export component BorderlessWindow inherits Window {
 				}
 			}
 
-			Rectangle {
-				width: root.width - 6px;
-				height: root.height - 6px;
-
-				@children
-			}
+			Rectangle { }
 
 			Rectangle {
-				background: red;
 				width: 3px;
 	
 				TouchArea {
@@ -122,7 +121,6 @@ export component BorderlessWindow inherits Window {
 
 		Row {
 			Rectangle {
-				background: red;
 				width: 3px;
 				height: 3px;
 	
@@ -141,7 +139,6 @@ export component BorderlessWindow inherits Window {
 			}
 
 			Rectangle {
-				background: red;
 				height: 3px;
 	
 				TouchArea {
@@ -159,7 +156,6 @@ export component BorderlessWindow inherits Window {
 			}
 
 			Rectangle {
-				background: red;
 				width: 3px;
 				height: 3px;
 	
