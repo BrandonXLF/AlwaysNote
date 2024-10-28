@@ -15,6 +15,8 @@ export component OptionPopup {
     }
 
     popup := PopupWindow {
+        property <bool> show-seconday;
+
         close-policy: close-on-click-outside;
 
         Rectangle {
@@ -49,8 +51,8 @@ export component OptionPopup {
                         right-click => {
                             item-ctx-menu.x = btn.width;
                             item-ctx-menu.y = btn.y;
-                            item-ctx-menu.visible = true;
                             item-ctx-menu.option = option;
+                            show-seconday = true;
                         }
                     }
 
@@ -63,6 +65,7 @@ export component OptionPopup {
                     for extra in extras: InlineButton {
                         text: extra;
                         text-color: ColorPalette.opposite;
+                        
                         clicked => {
                             extra-chosen(extra);
                             popup.close();
@@ -75,7 +78,7 @@ export component OptionPopup {
                 width: self.preferred-width;
                 height: self.preferred-height;
                 background: ColorPalette.milder;
-                visible: false;
+                visible: show-seconday;
     
                 property <string> option;
         
