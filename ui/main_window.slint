@@ -24,6 +24,7 @@ export component MainWindow inherits BorderlessWindow {
     callback mouse-move(length, length);
     callback set-current-note(string);
     callback set-text(string);
+    callback on-text-changed();
     callback rename <=> name-prompt.rename;
     callback delete <=> delete-prompt.delete;
     callback move-window(TextHorizontalAlignment, length, TextVerticalAlignment, length);
@@ -46,8 +47,12 @@ export component MainWindow inherits BorderlessWindow {
 
     set-text(new-text) => {
         text = new-text;
+        on-text-changed();
+    }
+
+    on-text-changed => {
         FindReplaceAdapter.text-edited(text);
-        NoteStoreAdapter.set-text(current-note, new-text);
+        NoteStoreAdapter.set-text(current-note, text);
     }
 
     move(hoz-pos, dx, vert-pos, dy) => {
@@ -145,7 +150,7 @@ export component MainWindow inherits BorderlessWindow {
                 }
 
                 edited => {
-                    set-text(root.text);
+                    on-text-changed();
                 }
             }
         }
