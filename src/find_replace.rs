@@ -98,6 +98,10 @@ pub fn init(win: &MainWindow) {
             let win = win_weak.unwrap();
             let adapter = win.global::<FindReplaceAdapter>();
 
+            if adapter.get_find_text().is_empty() {
+                return;
+            }
+
             let needle = adapter.get_find_text();
             let matches: Vec<(usize, &str)> = haystack.match_indices(needle.as_str()).collect();
 
@@ -113,10 +117,15 @@ pub fn init(win: &MainWindow) {
             let win = win_weak.unwrap();
             let adapter = win.global::<FindReplaceAdapter>();
 
+            adapter.set_current_index(0);
+
+            if adapter.get_find_text().is_empty() {
+                adapter.set_match_count(0);
+                return;
+            }
+
             let haystack = win.get_text();
             let matches: Vec<(usize, &str)> = haystack.match_indices(needle.as_str()).collect();
-
-            adapter.set_current_index(0);
             adapter.set_match_count(matches.len() as i32);
 
             select(
