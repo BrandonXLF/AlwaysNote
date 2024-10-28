@@ -10,10 +10,7 @@ export component InlineInput inherits Rectangle {
     accessible-role: button;
     horizontal-stretch: 1;
 
-    ref-rect := Rectangle {}
-
     Rectangle {
-        max-width: ref-rect.width;
         background: ColorPalette.theme;
         border-color: ColorPalette.border;
         border-width: 1px;
