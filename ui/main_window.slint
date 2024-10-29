@@ -59,6 +59,8 @@ export component MainWindow inherits BorderlessWindow {
         move-window(hoz-pos, dx, vert-pos, dy);
     }
 
+    forward-focus: main-input;
+
     FocusScope {
         key-pressed(e) => {
             if (e.text == Key.Tab) {
@@ -85,21 +87,21 @@ export component MainWindow inherits BorderlessWindow {
                     x: 0;
                     y: note-button.height;
 
-                    options: note-names;
-                    extras: ["Add new"];
+                    groups: [note-names, ["Add new"]];
                     actions: ["Rename", "Delete"];
+                    actionable-group-index: 0;
                     
-                    option-chosen(chosen-name) => {
-                        set-current-note(chosen-name);
+                    option-chosen(chosen-name, group-index) => {
+                        if (group-index == 0) {
+                            set-current-note(chosen-name);
+                        } else {
+                            close-prompts();
+                            name-prompt.set-old-name("");
+                            name-prompt.shown = true;
+                        }
                     }
 
-                    extra-chosen => {
-                        close-prompts();
-                        name-prompt.set-old-name("");
-                        name-prompt.shown = true;
-                    }
-
-                    action-clicked(action, name) => {
+                    action-chosen(action, name) => {
                         close-prompts();
 
                         if (action == "Rename") {
@@ -121,6 +123,7 @@ export component MainWindow inherits BorderlessWindow {
                         note-button := InlineButton {
                             text: current-note + " ▼";
                             text-color: ColorPalette.contrast;
+
                             clicked => {
                                 select-popup.show();
                             }

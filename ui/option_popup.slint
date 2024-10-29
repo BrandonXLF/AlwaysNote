@@ -2,23 +2,22 @@ import { InlineButton } from "inline_button.slint";
 import { ColorPalette } from "color_palette.slint";
 
 export component OptionPopup {
-    in-out property <[string]> options: [];
-    in-out property <[string]> extras: [];
-    in-out property <[string]> actions: [];
+    in property <[[string]]> groups: [];
+    in property <[string]> actions;
+    in property <int> actionable-group-index;
 
-    callback option-chosen(string);
-    callback extra-chosen(string);
-    callback action-clicked(string, string);
+    callback option-chosen(string, int);
+    callback action-chosen(string, string);
 
     public function show() {
         popup.show();
     }
 
     popup := PopupWindow {
-        property <bool> show-seconday;
+        property <bool> show-secondary;
 
-        width: main-content.preferred-width + item-ctx-menu.preferred-width - 1px;
-        height: max(main-content.preferred-height, item-ctx-menu.preferred-height);
+        width: main-content.width + item-ctx-menu.width - 1px;
+        height: max(main-content.height, item-ctx-menu.height);
         close-policy: close-on-click-outside;
 
         Rectangle {
@@ -42,57 +41,53 @@ export component OptionPopup {
             border-width: 1px;
 
             VerticalLayout {
-                for option in options: btn := InlineButton {
-                    text: option;
-                    text-color: ColorPalette.opposite;
-
-                    clicked => {
-                        option-chosen(option);
-                        popup.close();
+                for group[index] in groups: VerticalLayout {
+                    if index > 0: Rectangle {
+                        width: 100%;
+                        height: 1px;
+                        background: ColorPalette.border;
                     }
 
-                    right-click => {
-                        item-ctx-menu.y = btn.y;
-                        item-ctx-menu.option = option;
-                        show-seconday = true;
-                    }
-                }
+                    for option in group: btn := InlineButton {
+                        text: option;
+                        text-color: ColorPalette.opposite;
+    
+                        clicked => {
+                            option-chosen(option, index);
+                            popup.close();
+                        }
+    
+                        right-click => {
+                            show-secondary = actions.length > 0 && actionable-group-index == index;
 
-                if extras.length > 0: Rectangle {
-                    width: 100%;
-                    height: 1px;
-                    background: ColorPalette.border;
-                }
-
-                for extra in extras: InlineButton {
-                    text: extra;
-                    text-color: ColorPalette.opposite;
-
-                    clicked => {
-                        extra-chosen(extra);
-                        popup.close();
+                            if (show-secondary) {
+                                item-ctx-menu.y = btn.y;
+                                item-ctx-menu.option = option;
+                                show-secondary = true;
+                            }
+                        }
                     }
                 }
             }
         }
 
-       item-ctx-menu := Rectangle {
+        item-ctx-menu := Rectangle {
             x: main-content.preferred-width - 1px;
             width: self.preferred-width;
             height: self.preferred-height;
             background: ColorPalette.milder;
             border-color: ColorPalette.border;
             border-width: 1px;
-            visible: show-seconday;
+            visible: show-secondary;
 
             property <string> option;
 
             VerticalLayout {
                 for action in actions: InlineButton {
                     text: action;
-    
+
                     clicked => {
-                        action-clicked(action, option);
+                        action-chosen(action, option);
                         popup.close();
                     }
                 }
