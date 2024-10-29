@@ -56,9 +56,12 @@ export component EditorTextInput {
 		max-height <=> root.max-height;
 
 		text <=> parent.text;
-		single-line <=> parent.single-line;
-		wrap <=> parent.wrap;
-		color <=> parent.color;
+		
+		selection-foreground-color: ColorPalette.contrast;
+		selection-background-color: ColorPalette.accent;
+		single-line: parent.single-line;
+		wrap: parent.wrap;
+		color: parent.color;
 		
 		edited => {
 			edited();
