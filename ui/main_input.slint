@@ -1,5 +1,6 @@
 import { OptionPopup } from "option_popup.slint";
 import { ColorPalette } from "color_palette.slint";
+import { EditorTextInput } from "editor_text_input.slint";
 
 export component MainInput inherits Rectangle {
     in-out property <string> text;
@@ -11,34 +12,7 @@ export component MainInput inherits Rectangle {
         input.set-selection-offsets(start, end);
     }
 
-    vertical-stretch: 1;
-    horizontal-stretch: 1;
-
-    TouchArea {
-        pointer-event(e) => {
-            if (e.button == PointerEventButton.right && e.kind == PointerEventKind.up) {
-                ctx-menu.x = self.mouse-x;
-                ctx-menu.y = self.mouse-y;
-                ctx-menu.show();
-            }
-        }
-    }
-
-    ctx-menu := OptionPopup {
-        options: ["Find", "Cut", "Copy", "Paste"];
-
-        option-chosen(option) => {
-            if (option == "Find") {
-                show-find();
-            } else if (option == "Cut") {
-                input.cut();
-            } else if (option == "Copy") {
-                input.copy();
-            } else if (option == "Paste") {
-                input.paste();
-            }
-        }
-    }
+    forward-focus: input;
 
     FocusScope {
         key-pressed(e) => {
@@ -56,17 +30,18 @@ export component MainInput inherits Rectangle {
         Flickable {
             viewport-height: input.preferred-height + 8px;
 
-            input := TextInput {
+            input := EditorTextInput {
                 y: 4px;
                 width: parent.width - 8px;
                 min-height: root.height - 8px;
                 text <=> root.text;
                 single-line: false;
                 wrap: word-wrap;
-                color: ColorPalette.opposite;
 
-                init => {
-                    self.focus();
+                extra-options: ["Find"];
+                
+                extra-option-chosen(option) => {
+                    show-find();
                 }
             }
         }

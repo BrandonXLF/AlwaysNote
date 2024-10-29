@@ -1,0 +1,82 @@
+import { OptionPopup } from "option_popup.slint";
+import { ColorPalette } from "color_palette.slint";
+
+export component EditorTextInput {
+	in property <[string]> extra-options;
+	in-out property <string> text;
+	in property <bool> single-line: true;
+	in property <TextWrap> wrap;
+	in property <brush> color: ColorPalette.opposite;
+	out property <bool> has-focus: input.has-focus;
+
+	callback extra-option-chosen(string);
+	callback edited;
+
+	public function set-selection-offsets(start: int, end: int) {
+		input.set-selection-offsets(start, end);
+    }
+
+	forward-focus: input;
+
+	ctx-menu := OptionPopup {
+		states [
+			extra when extra-options.length > 0: {
+				groups: [extra-options, ["Cut", "Copy", "Paste"]];
+			}
+			basic when extra-options.length == 0: {
+				groups: [["Cut", "Copy", "Paste"]];
+			}
+		]
+
+        option-chosen(option) => {
+            if (option == "Cut") {
+                input.cut();
+            } else if (option == "Copy") {
+                input.copy();
+            } else if (option == "Paste") {
+                input.paste();
+            } else {
+				extra-option-chosen(option);
+			}
+        }
+    }
+
+	input := TextInput {	
+		x: 0;
+		y: 0;
+
+		width <=> parent.width;
+		preferred-width <=> parent.preferred-width;
+		min-width <=> parent.min-width;
+		max-width <=> parent.max-width;
+		
+		height <=> parent.width;
+		preferred-height <=> parent.preferred-height;
+		min-height <=> root.min-height;
+		max-height <=> root.max-height;
+
+		text <=> parent.text;
+		single-line <=> parent.single-line;
+		wrap <=> parent.wrap;
+		color <=> parent.color;
+		
+		edited => {
+			edited();
+		}
+	}
+
+	/*
+	// TODO: Cannot implement, https://github.com/slint-ui/slint/discussions/6679
+	TouchArea {
+		pointer-event(e) => {
+			if (e.button == PointerEventButton.right && e.kind == PointerEventKind.up) {
+				ctx-menu.x = self.mouse-x;
+				ctx-menu.y = self.mouse-y;
+				ctx-menu.show();
+			} else {
+				// ...
+			}
+		}
+	}
+	*/
+}

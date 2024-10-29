@@ -1,5 +1,6 @@
 import { ColorPalette } from "color_palette.slint";
 import { OptionPopup } from "option_popup.slint";
+import { EditorTextInput } from "editor_text_input.slint";
 
 export component InlineInput inherits Rectangle {
     in-out property <string> text <=> input.text;
@@ -28,37 +29,10 @@ export component InlineInput inherits Rectangle {
             }
         }
 
-        input-ctx := OptionPopup {
-            options: ["Cut", "Copy", "Paste"];
-
-            option-chosen(option) => {
-                if (option == "Cut") {
-                    input.cut();
-                } else if (option == "Copy") {
-                    input.copy();
-                } else if (option == "Paste") {
-                    input.paste();
-                }
-            }
-        }
-
-        TouchArea {
-            vertical-stretch: 1;
-            horizontal-stretch: 1;
-
-            pointer-event(e) => {
-                if (e.button == PointerEventButton.right && e.kind == PointerEventKind.up) {
-                    input-ctx.x = self.mouse-x;
-                    input-ctx.y = self.mouse-y;
-                    input-ctx.show();
-                }
-            }
-        }
-
         HorizontalLayout {
             padding: 4px;
 
-            input := TextInput {
+            input := EditorTextInput {
                 single-line: true;
             }
         }
