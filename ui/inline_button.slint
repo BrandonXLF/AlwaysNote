@@ -7,7 +7,7 @@ export component InlineButton inherits Rectangle {
     in property <length> vertical-offset: 0px;
 
     callback clicked <=> touch.clicked;
-    callback right-click;
+    callback right-click(length, length);
 
     accessible-role: button;
 
@@ -21,7 +21,7 @@ export component InlineButton inherits Rectangle {
 
         pointer-event(e) => {
             if (e.button == PointerEventButton.right && e.kind == PointerEventKind.up) {
-                right-click();
+                right-click(self.mouse-x, self.mouse-y);
             }
         }
     }

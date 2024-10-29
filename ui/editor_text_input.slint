@@ -73,8 +73,8 @@ export component EditorTextInput {
 	TouchArea {
 		pointer-event(e) => {
 			if (e.button == PointerEventButton.right && e.kind == PointerEventKind.up) {
-				ctx-menu.x = self.mouse-x;
-				ctx-menu.y = self.mouse-y;
+				ctx-menu.x = self.mouse-x + 4px;
+				ctx-menu.y = self.mouse-y + 4px;
 				ctx-menu.show();
 			} else {
 				// ...

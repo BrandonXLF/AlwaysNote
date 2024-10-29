@@ -17,8 +17,8 @@ export component OptionPopup {
     popup := PopupWindow {
         property <bool> show-secondary;
 
-        width: main-content.width + item-ctx-menu.width - 1px;
-        height: max(main-content.height, item-ctx-menu.height);
+        width: main-menu.width + item-ctx-menu.width - 1px;
+        height: main-menu.height + item-ctx-menu.height;
         close-policy: close-on-click-outside;
 
         Rectangle {
@@ -75,11 +75,12 @@ export component OptionPopup {
                             popup.close();
                         }
     
-                        right-click => {
+                        right-click(mouse-x, mouse-y) => {
                             show-secondary = actions.length > 0 && actionable-group-index == index;
 
                             if (show-secondary) {
-                                item-ctx-menu.y = btn.y;
+                                item-ctx-menu.x = mouse-x + 4px;
+                                item-ctx-menu.y = mouse-y + btn.y + 4px;
                                 item-ctx-menu.option = option;
                                 show-secondary = true;
                             }
