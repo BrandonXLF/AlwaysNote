@@ -1,0 +1,40 @@
+import { ColorPalette } from "color_palette.slint";
+import { OptionPopup } from "option_popup.slint";
+import { EditorTextInput } from "editor_text_input.slint";
+
+export component InlineInput inherits Rectangle {
+    in-out property <string> text <=> input.text;
+    in-out property <string> placeholder: "";
+    
+    callback edited <=> input.edited;
+
+    accessible-role: button;
+    horizontal-stretch: 1;
+
+    Rectangle {
+        background: ColorPalette.theme;
+        border-color: ColorPalette.border;
+        border-width: 1px;
+
+        if input.has-focus: Rectangle {
+            border-color: ColorPalette.opposite;
+            border-width: 1px;
+        }
+
+        if placeholder != "" && text == "": HorizontalLayout {
+            padding: 4px;
+
+            Text {
+                text <=> placeholder;
+            }
+        }
+
+        HorizontalLayout {
+            padding: 4px;
+
+            input := EditorTextInput {
+                single-line: true;
+            }
+        }
+    }
+}

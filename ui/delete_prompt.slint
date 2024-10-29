@@ -1,0 +1,36 @@
+import { InlineButton } from "inline_button.slint";
+import { InlineInput } from "inline_input.slint";
+import { ColorPalette } from "color_palette.slint";
+import { Prompt } from "prompt.slint";
+import { NoteModelAdapter } from "model_adapter.slint";
+
+export component DeletePrompt inherits Prompt {
+    VerticalLayout {
+        padding: 4px;
+        spacing: 4px;
+
+        Text {
+            text: "Are you sure you want to delete \"" + NoteModelAdapter.delete-target + "\"?";
+        }
+
+        HorizontalLayout {
+            alignment: LayoutAlignment.space-around;
+            spacing: 4px;
+
+            InlineButton {
+                text: "Yes";
+                clicked => {
+                    NoteModelAdapter.delete(NoteModelAdapter.delete-target);
+                    root.close();
+                }
+            }
+
+            InlineButton {
+                text: "No";
+                clicked => {
+                    root.close();
+                }
+            }
+        }
+    }
+}

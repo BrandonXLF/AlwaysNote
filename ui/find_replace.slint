@@ -1,0 +1,95 @@
+import { InlineButton } from "inline_button.slint";
+import { InlineInput } from "inline_input.slint";
+import { ColorPalette } from "color_palette.slint";
+import { Prompt } from "prompt.slint";
+
+export global FindReplaceAdapter {
+    in-out property <string> find-text;
+    in-out property <string> replace-text;
+    in-out property <int> current-index: 0;
+    in-out property <int> match-count: 0;
+
+    callback prev-pressed();
+    callback next-pressed();
+    callback one-pressed();
+    callback all-pressed();
+    callback find-edited(string);
+    callback text-edited(string);
+}
+
+export component FindReplace inherits Prompt {
+    VerticalLayout {
+        padding: 4px;
+        spacing: 4px;
+
+        HorizontalLayout {
+            spacing: 4px;
+
+            find-input := InlineInput {
+                text <=> FindReplaceAdapter.find-text;
+                placeholder: "Find...";
+                edited => {
+                    FindReplaceAdapter.find_edited(find-input.text);
+                }
+            }
+
+            InlineButton {
+                text: "▲";
+                accessible-label: "Previous";
+                clicked => {
+                    FindReplaceAdapter.prev-pressed();
+                }
+            }
+            
+            InlineButton {
+                text: "▼";
+                accessible-label: "Next";
+                clicked => {
+                    FindReplaceAdapter.next-pressed();
+                }
+            }
+            
+            InlineButton {
+                text: "🗙";
+                accessible-label: "Close";
+                vertical-offset: -1px;
+                clicked => {
+                    FindReplaceAdapter.current-index = 0;
+                    FindReplaceAdapter.match-count = 0;
+                    root.close();
+                }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 4px;
+
+            InlineInput {
+                text <=> FindReplaceAdapter.replace-text;
+                placeholder: "Replace...";
+            }
+
+            InlineButton {
+                text: "One";
+                clicked => {
+                    FindReplaceAdapter.one-pressed();
+                }
+            }
+
+            InlineButton {
+                text: "All";
+                clicked => {
+                    FindReplaceAdapter.all-pressed();
+                }
+            }
+        }
+    }
+
+    find-status := Text {
+        x: find-input.x + find-input.width - find-status.preferred-width;
+        y: find-input.y + find-status.preferred-height / 2 + 1px;
+        text: (FindReplaceAdapter.current-index + (FindReplaceAdapter.match-count == 0 ? 0 : 1))
+            + "/"
+            + FindReplaceAdapter.match-count;
+    }
+}

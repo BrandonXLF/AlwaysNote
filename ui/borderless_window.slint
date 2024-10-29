@@ -1,0 +1,177 @@
+import { FindReplace, FindReplaceAdapter } from "find_replace.slint";
+import { InlineButton } from "inline_button.slint";
+import { NamePrompt } from "name_prompt.slint";
+import { DeletePrompt } from "delete_prompt.slint";
+import { OptionPopup } from "option_popup.slint";
+import { ColorPalette } from "color_palette.slint";
+import { MainInput } from "main_input.slint";
+
+export component BorderlessWindow inherits Window {
+    callback move(TextHorizontalAlignment, length, TextVerticalAlignment, length);
+	
+	title: "AlwaysNote";
+	no-frame: true;
+    background: ColorPalette.translucent;
+    always-on-top: true;
+    preferred-width: 250px;
+    preferred-height: 250px;
+
+	Rectangle {
+		Rectangle {
+			width: parent.width;
+			height: parent.height;
+
+			@children
+		}
+	}
+
+	GridLayout {
+		Row {
+			Rectangle {
+				width: 3px;
+				height: 3px;
+	
+				TouchArea {
+					mouse-cursor: nw-resize;
+
+					moved => {
+						move(
+							TextHorizontalAlignment.left,
+							self.mouse-x - self.pressed-x,
+							TextVerticalAlignment.top,
+							self.mouse-y - self.pressed-y
+						);
+					}
+				}
+			}
+
+			Rectangle {
+				height: 3px;
+	
+				TouchArea {
+					mouse-cursor: n-resize;
+
+					moved => {
+						move(
+							TextHorizontalAlignment.center,
+							0,
+							TextVerticalAlignment.top,
+							self.mouse-y - self.pressed-y
+						);
+					}
+				}
+			}
+
+			Rectangle {
+				width: 3px;
+				height: 3px;
+	
+				TouchArea {
+					mouse-cursor: ne-resize;
+
+					moved => {
+						move(
+							TextHorizontalAlignment.right,
+							self.mouse-x - self.pressed-x,
+							TextVerticalAlignment.top,
+							self.mouse-y - self.pressed-y
+						);
+					}
+				}
+			}
+		}
+
+		Row {
+			Rectangle {
+				width: 3px;
+	
+				TouchArea {
+					mouse-cursor: w-resize;
+					
+					moved => {
+						move(
+							TextHorizontalAlignment.left,
+							self.mouse-x - self.pressed-x,
+							TextVerticalAlignment.center,
+							0
+						);
+					}
+				}
+			}
+
+			Rectangle { }
+
+			Rectangle {
+				width: 3px;
+	
+				TouchArea {
+					mouse-cursor: e-resize;
+
+					moved => {
+						move(
+							TextHorizontalAlignment.right,
+							self.mouse-x - self.pressed-x,
+							TextVerticalAlignment.center,
+							0
+						);
+					}
+				}
+			}
+		}
+
+		Row {
+			Rectangle {
+				width: 3px;
+				height: 3px;
+	
+				TouchArea {
+					mouse-cursor: sw-resize;
+
+					moved => {
+						move(
+							TextHorizontalAlignment.left,
+							self.mouse-x - self.pressed-x,
+							TextVerticalAlignment.bottom,
+							self.mouse-y - self.pressed-y
+						);
+					}
+				}
+			}
+
+			Rectangle {
+				height: 3px;
+	
+				TouchArea {
+					mouse-cursor: s-resize;
+
+					moved => {
+						move(
+							TextHorizontalAlignment.center,
+							0,
+							TextVerticalAlignment.bottom,
+							self.mouse-y - self.pressed-y
+						);
+					}
+				}
+			}
+
+			Rectangle {
+				width: 3px;
+				height: 3px;
+	
+				TouchArea {
+					mouse-cursor: se-resize;
+
+					moved => {
+						move(
+							TextHorizontalAlignment.right,
+							self.mouse-x - self.pressed-x,
+							TextVerticalAlignment.bottom,
+							self.mouse-y - self.pressed-y
+						);
+					}
+				}
+			}
+		}
+	}
+}

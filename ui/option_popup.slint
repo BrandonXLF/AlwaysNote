@@ -1,0 +1,116 @@
+import { InlineButton } from "inline_button.slint";
+import { ColorPalette } from "color_palette.slint";
+
+export component OptionPopup {
+    in property <[[string]]> groups: [];
+    in property <[string]> actions;
+    in property <int> actionable-group-index;
+    in property <bool> main-content;
+
+    callback option-chosen(string, int);
+    callback action-chosen(string, string);
+
+    public function show() {
+        popup.show();
+    }
+
+    popup := PopupWindow {
+        property <bool> show-secondary;
+
+        width: main-menu.width + item-ctx-menu.width - 1px;
+        height: main-menu.height + item-ctx-menu.height;
+        close-policy: close-on-click-outside;
+
+        Rectangle {
+            width: popup.width;
+            height: popup.height;
+
+            TouchArea {       
+                clicked() => {
+                    popup.close();
+                }
+            }
+        }
+
+        main-menu := Rectangle {
+            x: 0;
+            y: 0;
+            width: self.preferred-width;
+            height: self.preferred-height;
+            border-width: 1px;
+
+            states [
+                main when main-content: {
+                    background: ColorPalette.accent;
+                    border-color: ColorPalette.accent;
+                }
+                aux when !main-content: {
+                    background: ColorPalette.milder;
+                    border-color: ColorPalette.border;
+                }
+            ]
+
+            VerticalLayout {
+                for group[index] in groups: VerticalLayout {
+                    if index > 0: Rectangle {
+                        width: 100%;
+                        height: 1px;
+                        background: ColorPalette.border;
+                    }
+
+                    for option in group: btn := InlineButton {
+                        text: option;
+
+                        states [
+                            main when main-content: {
+                                text-color: ColorPalette.contrast;
+                            }
+                            aux when !main-content: {
+                                text-color: ColorPalette.opposite;
+                            }
+                        ]
+    
+                        clicked => {
+                            option-chosen(option, index);
+                            popup.close();
+                        }
+    
+                        right-click(mouse-x, mouse-y) => {
+                            show-secondary = actions.length > 0 && actionable-group-index == index;
+
+                            if (show-secondary) {
+                                item-ctx-menu.x = mouse-x + 4px;
+                                item-ctx-menu.y = mouse-y + btn.y + 4px;
+                                item-ctx-menu.option = option;
+                                show-secondary = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item-ctx-menu := Rectangle {
+            width: self.preferred-width;
+            height: self.preferred-height;
+            background: ColorPalette.milder;
+            border-color: ColorPalette.border;
+            border-width: 1px;
+            visible: show-secondary;
+
+            property <string> option;
+
+            VerticalLayout {
+                for action in actions: InlineButton {
+                    text: action;
+                    text-color: ColorPalette.opposite;
+
+                    clicked => {
+                        action-chosen(action, option);
+                        popup.close();
+                    }
+                }
+            }
+        }
+    }
+}

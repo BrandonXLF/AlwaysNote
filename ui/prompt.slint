@@ -1,0 +1,16 @@
+import { ColorPalette } from "color_palette.slint";
+
+export component Prompt inherits Rectangle {
+    callback close();
+
+    background: ColorPalette.milder;
+    height: root.preferred-height;
+
+    Rectangle {
+        y: root.height - 1px;
+        height: 1px;
+        background: ColorPalette.border;
+    }
+
+    @children
+}

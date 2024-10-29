@@ -1,0 +1,7 @@
+export global NoteModelAdapter {
+    in-out property <string> rename-old-name;
+	in-out property <string> delete-target;
+
+	callback rename(string, string);
+	callback delete(string);
+}

@@ -1,0 +1,48 @@
+import { InlineButton } from "inline_button.slint";
+import { InlineInput } from "inline_input.slint";
+import { ColorPalette } from "color_palette.slint";
+import { Prompt } from "prompt.slint";
+import { NoteModelAdapter } from "model_adapter.slint";
+
+export component NamePrompt inherits Prompt {
+    VerticalLayout {
+        padding: 4px;
+        spacing: 4px;
+
+        Text {
+            text: "Enter name:";
+        }
+
+        input := InlineInput {
+            text: NoteModelAdapter.rename-old-name;
+        }
+
+        HorizontalLayout {
+            alignment: LayoutAlignment.space-around;
+            spacing: 4px;
+
+            if NoteModelAdapter.rename-old-name == "": InlineButton {
+                text: "Create";
+                clicked => {
+                    NoteModelAdapter.rename(NoteModelAdapter.rename-old-name, input.text);
+                    root.close();
+                }
+            }
+
+            if NoteModelAdapter.rename-old-name != "": InlineButton {
+                text: "Rename";
+                clicked => {
+                    NoteModelAdapter.rename(NoteModelAdapter.rename-old-name, input.text);
+                    root.close();
+                }
+            }
+
+            InlineButton {
+                text: "Cancel";
+                clicked => {
+                    root.close();
+                }
+            }
+        }
+    }
+}
