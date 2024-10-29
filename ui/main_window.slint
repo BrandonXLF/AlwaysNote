@@ -86,6 +86,7 @@ export component MainWindow inherits BorderlessWindow {
                 select-popup := OptionPopup {
                     x: 0;
                     y: note-button.height;
+                    main-content: true;
 
                     groups: [note-names, ["Add new"]];
                     actions: ["Rename", "Delete"];
