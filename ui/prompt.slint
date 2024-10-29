@@ -1,9 +1,10 @@
 import { ColorPalette } from "color_palette.slint";
 
 export component Prompt inherits Rectangle {
-    in-out property <bool> shown: false;
+    callback close();
 
     background: ColorPalette.milder;
+    height: root.preferred-height;
 
     Rectangle {
         y: root.height - 1px;
@@ -11,14 +12,5 @@ export component Prompt inherits Rectangle {
         background: ColorPalette.border;
     }
 
-    states [
-        hidden when !shown: {
-            height: 0;
-            visible: false;
-        }
-        visible when shown: {
-            height: root.preferred-height;
-            visible: true;
-        }
-    ]
+    @children
 }

@@ -56,7 +56,7 @@ export component FindReplace inherits Prompt {
                 clicked => {
                     FindReplaceAdapter.current-index = 0;
                     FindReplaceAdapter.match-count = 0;
-                    root.shown = false;
+                    root.close();
                 }
             }
         }

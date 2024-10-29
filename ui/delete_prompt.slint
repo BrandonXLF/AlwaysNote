@@ -2,18 +2,15 @@ import { InlineButton } from "inline_button.slint";
 import { InlineInput } from "inline_input.slint";
 import { ColorPalette } from "color_palette.slint";
 import { Prompt } from "prompt.slint";
+import { NoteModelAdapter } from "model_adapter.slint";
 
 export component DeletePrompt inherits Prompt {
-    in-out property <string> target;
-
-    callback delete(string);
-
     VerticalLayout {
         padding: 4px;
         spacing: 4px;
 
         Text {
-            text: "Are you sure you want to delete \"" + target + "\"?";
+            text: "Are you sure you want to delete \"" + NoteModelAdapter.delete-target + "\"?";
         }
 
         HorizontalLayout {
@@ -23,15 +20,15 @@ export component DeletePrompt inherits Prompt {
             InlineButton {
                 text: "Yes";
                 clicked => {
-                    delete(target);
-                    root.shown = false;
+                    NoteModelAdapter.delete(NoteModelAdapter.delete-target);
+                    root.close();
                 }
             }
 
             InlineButton {
                 text: "No";
                 clicked => {
-                    root.shown = false;
+                    root.close();
                 }
             }
         }

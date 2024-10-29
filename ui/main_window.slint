@@ -6,8 +6,9 @@ import { OptionPopup } from "option_popup.slint";
 import { ColorPalette } from "color_palette.slint";
 import { MainInput } from "main_input.slint";
 import { BorderlessWindow } from "borderless_window.slint";
+import { NoteModelAdapter } from "model_adapter.slint";
 
-export { FindReplaceAdapter, ColorPalette }
+export { FindReplaceAdapter, ColorPalette, NoteModelAdapter }
 
 export global NoteStoreAdapter {
     pure callback get-text(string) -> string;
@@ -19,14 +20,16 @@ export component MainWindow inherits BorderlessWindow {
     in-out property <[string]> note-names;
     out property <string> current-note;
     out property <string> text;
+    
+    property <bool> delete-enabled;
+    property <bool> name-enabled;
+    property <bool> find-enabled;
 
     callback close <=> close-button.clicked;
     callback mouse-move(length, length);
     callback set-current-note(string);
     callback set-text(string);
     callback on-text-changed();
-    callback rename <=> name-prompt.rename;
-    callback delete <=> delete-prompt.delete;
     callback move-window(TextHorizontalAlignment, length, TextVerticalAlignment, length);
     
     public function set-selection-offsets(start: int, end: int) {
@@ -34,9 +37,9 @@ export component MainWindow inherits BorderlessWindow {
     }
     
     function close-prompts() {
-        delete-prompt.shown = false;
-        name-prompt.shown = false;
-        find-prompt.shown = false;
+        delete-enabled = false;
+        name-enabled = false;
+        find-enabled = false;
     }
 
     set-current-note(note) => {
@@ -97,8 +100,8 @@ export component MainWindow inherits BorderlessWindow {
                             set-current-note(chosen-name);
                         } else {
                             close-prompts();
-                            name-prompt.set-old-name("");
-                            name-prompt.shown = true;
+                            NoteModelAdapter.rename-old-name = "";
+                            name-enabled = true;
                         }
                     }
 
@@ -106,11 +109,11 @@ export component MainWindow inherits BorderlessWindow {
                         close-prompts();
 
                         if (action == "Rename") {
-                            name-prompt.set-old-name(name);
-                            name-prompt.shown = true;
+                            NoteModelAdapter.rename-old-name = name;
+                            name-enabled = true;
                         } else if (action == "Delete") {
-                            delete-prompt.target = name;
-                            delete-prompt.shown = true;
+                            NoteModelAdapter.delete-target = name;
+                            delete-enabled = true;
                         }
                     }
                 }
@@ -141,16 +144,30 @@ export component MainWindow inherits BorderlessWindow {
                 }
             }
             
-            name-prompt := NamePrompt {}
-            delete-prompt := DeletePrompt {}
-            find-prompt := FindReplace {}
+            if name-enabled: name-prompt := NamePrompt {
+                close => {
+                    name-enabled = false;
+                }
+            }
+
+            if delete-enabled: delete-prompt := DeletePrompt {
+                close => {
+                    delete-enabled = false;
+                }
+            }
+            
+            if find-enabled: find-prompt := FindReplace {
+                close => {
+                    find-enabled = false;
+                }
+            }
             
             main-input := MainInput {
                 text <=> root.text;
 
                 show-find => {
                     close-prompts();
-                    find-prompt.shown = true;
+                    find-enabled = true;
                 }
 
                 edited => {

@@ -26,7 +26,9 @@ impl NoteModel {
             notify: Default::default(),
         });
 
-        win.on_rename({
+        let model_adapter = win.global::<NoteModelAdapter>();
+
+        model_adapter.on_rename({
             let model = model.clone();
 
             move |old_name, new_name| {
@@ -34,7 +36,7 @@ impl NoteModel {
             }
         });
 
-        win.on_delete({
+        model_adapter.on_delete({
             let model = model.clone();
 
             move |delete_name| {
