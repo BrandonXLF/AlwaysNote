@@ -6,7 +6,6 @@ use crate::{
     store_adapter,
     ui::*,
 };
-use i_slint_backend_winit::{winit::platform::windows::WindowExtWindows, WinitWindowAccessor};
 use i_slint_core::items::{TextHorizontalAlignment, TextVerticalAlignment};
 
 pub struct Notepad {
@@ -83,10 +82,12 @@ impl Notepad {
             }
         });
 
+        /*
         // TODO: workaround for https://github.com/slint-ui/slint/issues/4341
         win.window().with_winit_window(|winit_win| {
             winit_win.set_skip_taskbar(true);
         });
+        */
 
         let color_holder = color_palette::init(&win);
         find_replace::init(&win);
