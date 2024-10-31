@@ -6,6 +6,10 @@ export component OptionPopup {
     in property <[string]> actions;
     in property <int> actionable-group-index;
     in property <bool> main-content;
+    
+    property <length> sub-x;
+    property <length> sub-y;
+    property <string> sub-option;
 
     callback option-chosen(string, int);
     callback action-chosen(string, string);
@@ -15,26 +19,11 @@ export component OptionPopup {
     }
 
     popup := PopupWindow {
-        property <bool> show-secondary;
-
-        width: main-menu.width + item-ctx-menu.width - 1px;
-        height: main-menu.height + item-ctx-menu.height;
+        width: main-menu.width;
+        height: main-menu.height;
         close-policy: close-on-click-outside;
 
-        Rectangle {
-            width: popup.width;
-            height: popup.height;
-
-            TouchArea {       
-                clicked() => {
-                    popup.close();
-                }
-            }
-        }
-
         main-menu := Rectangle {
-            x: 0;
-            y: 0;
             width: self.preferred-width;
             height: self.preferred-height;
             border-width: 1px;
@@ -76,29 +65,32 @@ export component OptionPopup {
                         }
     
                         right-click(mouse-x, mouse-y) => {
-                            show-secondary = actions.length > 0 && actionable-group-index == index;
-
-                            if (show-secondary) {
-                                item-ctx-menu.x = mouse-x + 4px;
-                                item-ctx-menu.y = mouse-y + btn.y + 4px;
-                                item-ctx-menu.option = option;
-                                show-secondary = true;
+                            if (actions.length > 0 && actionable-group-index == index) {
+                                sub-x = mouse-x + 4px;
+                                sub-y = mouse-y + btn.y + 4px;
+                                sub-option = option;
+                                sub-menu.show();
                             }
                         }
                     }
                 }
             }
         }
+    }
 
-        item-ctx-menu := Rectangle {
+    sub-menu := PopupWindow {
+        x: sub-x;
+        y: sub-y;
+        width: item-ctx-content.width;
+        height: item-ctx-content.height;
+        close-policy: close-on-click;
+
+        item-ctx-content := Rectangle {
             width: self.preferred-width;
             height: self.preferred-height;
             background: ColorPalette.milder;
             border-color: ColorPalette.border;
             border-width: 1px;
-            visible: show-secondary;
-
-            property <string> option;
 
             VerticalLayout {
                 for action in actions: InlineButton {
@@ -106,8 +98,8 @@ export component OptionPopup {
                     text-color: ColorPalette.opposite;
 
                     clicked => {
-                        action-chosen(action, option);
-                        popup.close();
+                        action-chosen(action, sub-option);
+                        // popup.close();
                     }
                 }
             }
