@@ -40,7 +40,6 @@ pub fn show(win_weak: slint::Weak<MainWindow>) {
                     TrayIconEvent::Exit => process::exit(0),
                     TrayIconEvent::Open => win_weak.ensure(),
                     TrayIconEvent::Toggle => win_weak.toggle(),
-                    // TODO: Handle, user cannot close the program otherwise
                     TrayIconEvent::Menu => { let _ = tray_icon.show_menu(); }
                 }
             }
