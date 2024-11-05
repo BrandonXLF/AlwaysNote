@@ -1,3 +1,5 @@
+use i_slint_core::items::{TextHorizontalAlignment, TextVerticalAlignment};
+
 use crate::{
     color_palette::{self, ColorValueEventHolder},
     find_replace,
@@ -6,7 +8,6 @@ use crate::{
     store_adapter,
     ui::*,
 };
-use i_slint_core::items::{TextHorizontalAlignment, TextVerticalAlignment};
 
 pub struct Notepad {
     pub win: MainWindow,
@@ -24,7 +25,9 @@ impl Notepad {
                 let win = win_weak.unwrap();
                 let sys_win = win.window();
 
-                if hoz_pos == TextHorizontalAlignment::Left || vert_pos == TextVerticalAlignment::Top {
+                if hoz_pos == TextHorizontalAlignment::Left
+                    || vert_pos == TextVerticalAlignment::Top
+                {
                     let logical_pos = sys_win
                         .position()
                         .to_logical(win_weak.unwrap().window().scale_factor());
@@ -42,10 +45,7 @@ impl Notepad {
                         dy = -dy;
                     }
 
-                    sys_win.set_position(slint::LogicalPosition::new(
-                        pos_x,
-                        pos_y,
-                    ));
+                    sys_win.set_position(slint::LogicalPosition::new(pos_x, pos_y));
                 }
 
                 let logical_size = sys_win
@@ -96,6 +96,9 @@ impl Notepad {
         win.set_note_names(NoteModel::rc_from_saved(&win).into());
         win.invoke_set_current_note(NoteStore::get_current_note().into());
 
-        Notepad { win, _color_holder: color_holder }
+        Notepad {
+            win,
+            _color_holder: color_holder,
+        }
     }
 }

@@ -2,7 +2,7 @@ use std::{process, thread};
 
 use trayicon::{Icon, MenuBuilder, TrayIconBuilder};
 
-use crate::{win_manipulator::WindowManipulator, ui::*};
+use crate::{ui::*, win_manipulator::WindowManipulator};
 
 #[derive(Clone, Eq, PartialEq, Debug)]
 enum TrayIconEvent {
@@ -33,14 +33,14 @@ pub fn show(win_weak: slint::Weak<MainWindow>) {
         .build()
         .unwrap();
 
-    thread::spawn(move || {
-        loop {
-            if let Ok(event) = r.recv() {
-                match event {
-                    TrayIconEvent::Exit => process::exit(0),
-                    TrayIconEvent::Open => win_weak.ensure(),
-                    TrayIconEvent::Toggle => win_weak.toggle(),
-                    TrayIconEvent::Menu => { let _ = tray_icon.show_menu(); }
+    thread::spawn(move || loop {
+        if let Ok(event) = r.recv() {
+            match event {
+                TrayIconEvent::Exit => process::exit(0),
+                TrayIconEvent::Open => win_weak.ensure(),
+                TrayIconEvent::Toggle => win_weak.toggle(),
+                TrayIconEvent::Menu => {
+                    let _ = tray_icon.show_menu();
                 }
             }
         }

@@ -5,7 +5,7 @@ use windows_hotkeys::{
     HotkeyManager, HotkeyManagerImpl,
 };
 
-use crate::{win_manipulator::WindowManipulator, ui::*};
+use crate::{ui::*, win_manipulator::WindowManipulator};
 
 pub fn add(win_weak: slint::Weak<MainWindow>) {
     thread::spawn(|| {

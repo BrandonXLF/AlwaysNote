@@ -18,7 +18,7 @@ use slint::ComponentHandle;
 use win_manipulator::WindowManipulator;
 
 fn main() {
-    let notepad= Notepad::new();
+    let notepad = Notepad::new();
 
     hotkey::add(notepad.win.as_weak());
     tray_icon::show(notepad.win.as_weak());
