@@ -1,4 +1,7 @@
-use crate::ui::*;
+use crate::{
+    skip_taskbar::{skip_taskbar, skip_taskbar_in_loop},
+    ui::*,
+};
 
 pub trait WindowManipulator {
     fn ensure(&self);
@@ -8,21 +11,28 @@ pub trait WindowManipulator {
 impl WindowManipulator for MainWindow {
     fn ensure(&self) {
         let _ = self.show();
+        skip_taskbar();
     }
 
     fn toggle(&self) {
-        let _ = if self.window().is_visible() {
-            self.hide()
-        } else {
-            self.show()
-        };
+        if self.window().is_visible() {
+            let _ = self.hide();
+            return;
+        }
+
+        self.ensure();
     }
+}
+
+fn ensure_in_loop(win: &MainWindow) {
+    win.show().unwrap();
+    skip_taskbar_in_loop();
 }
 
 impl WindowManipulator for slint::Weak<MainWindow> {
     fn ensure(&self) {
         let _ = self.upgrade_in_event_loop(move |win| {
-            win.show().unwrap();
+            ensure_in_loop(&win);
         });
     }
 
@@ -30,9 +40,10 @@ impl WindowManipulator for slint::Weak<MainWindow> {
         let _ = self.upgrade_in_event_loop(move |win| {
             if win.window().is_visible() {
                 win.hide().unwrap();
-            } else {
-                win.show().unwrap();
+                return;
             }
+
+            ensure_in_loop(&win);
         });
     }
 }

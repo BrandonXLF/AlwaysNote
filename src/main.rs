@@ -6,6 +6,7 @@ mod hotkey;
 mod note_model;
 mod note_store;
 mod notepad;
+mod skip_taskbar;
 mod store_adapter;
 mod tray_icon;
 mod ui;

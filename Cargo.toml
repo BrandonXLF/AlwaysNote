@@ -11,6 +11,7 @@ slint = { version = "1.9.0", git = "https://github.com/slint-ui/slint.git", defa
 trayicon = { version = "0.2.0" }
 windows = { version = "0.58.0", "features" = [ "Foundation", "UI_ViewManagement" ] }
 windows-hotkeys = "0.2.1"
+winsafe = { version = "0.0.22", features = [ "user", "shell" ] }
 
 [build-dependencies]
 slint-build = { version = "1.9.0", git = "https://github.com/slint-ui/slint.git" }

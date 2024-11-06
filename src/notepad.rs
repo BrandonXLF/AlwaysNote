@@ -82,13 +82,6 @@ impl Notepad {
             }
         });
 
-        /*
-        // TODO: workaround for https://github.com/slint-ui/slint/issues/4341
-        win.window().with_winit_window(|winit_win| {
-            winit_win.set_skip_taskbar(true);
-        });
-        */
-
         let color_holder = color_palette::init(&win);
         find_replace::init(&win);
         store_adapter::init(&win);
