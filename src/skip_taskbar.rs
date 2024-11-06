@@ -9,10 +9,7 @@ pub fn skip_taskbar_in_loop() {
         if let Ok(taskbar) =
             CoCreateInstance::<ITaskbarList>(&CLSID::TaskbarList, None, CLSCTX::INPROC_SERVER)
         {
-            taskbar.HrInit().and_then(|_| {
-                taskbar.DeleteTab(&hwnd);
-                Ok(())
-            });
+            let _ = taskbar.HrInit().and_then(|_| taskbar.DeleteTab(&hwnd));
         }
     }
 }
