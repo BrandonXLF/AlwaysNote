@@ -25,8 +25,7 @@ fn main() {
     tray_icon::show(notepad.win.as_weak());
 
     {
-        let args: Vec<String> = env::args().collect();
-        let switch: &str = args.get(1).map_or("", |x| x.as_str());
+        let switch = env::args().nth(1).unwrap_or_else(|| "".into());
 
         if switch != "--minimized" {
             notepad.win.ensure();
