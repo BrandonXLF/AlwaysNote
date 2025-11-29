@@ -6,13 +6,13 @@ edition = "2021"
 [dependencies]
 crossbeam-channel = "0.5.12"
 dirs = "5.0.1"
-i-slint-core = { version = "1.9.0", git = "https://github.com/slint-ui/slint.git" }
-slint = { version = "1.9.0", git = "https://github.com/slint-ui/slint.git", default-features = false, features = [ "accessibility", "backend-qt", "compat-1-2", "std" ] }
+i-slint-core = { version = "=1.13.1" }
+slint = { version = "=1.13.1", default-features = false, features = [ "accessibility", "backend-qt", "compat-1-2", "std" ] }
 trayicon = { version = "0.2.0" }
 windows = { version = "0.58.0", "features" = [ "Foundation", "UI_ViewManagement" ] }
 windows-hotkeys = "0.2.1"
 winsafe = { version = "0.0.22", features = [ "user", "shell" ] }
 
 [build-dependencies]
-slint-build = { version = "1.9.0", git = "https://github.com/slint-ui/slint.git" }
+slint-build = { version = "=1.13.1" }
 windres = "0.2.2"
