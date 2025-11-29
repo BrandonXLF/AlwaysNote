@@ -50,4 +50,7 @@
 	<ItemGroup>
 		<FrameworkAssemblies Remove="Resources\**" />
 	</ItemGroup>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="makensis ../NSIS.nsi" />
+	</Target>
 </Project>
