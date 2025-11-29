@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Interop;
 
 namespace AlwaysNote {
-    internal class Hotkey : System.Windows.Forms.NativeWindow {
+    internal class Hotkey {
         private static readonly int WM_HOTKEY = 0x0312;
         private readonly NoteWindow window;
 
@@ -18,19 +20,22 @@ namespace AlwaysNote {
 
         public Hotkey(NoteWindow window) {
             this.window = window;
-            CreateHandle(new System.Windows.Forms.CreateParams());
+
+            HwndSource source = PresentationSource.FromVisual(window) as HwndSource;
+            source.AddHook(WndProc);
+        }
+
+        private nint WndProc(nint hwnd, int msg, nint wParam, nint lParam, ref bool handled) {
+            if (msg == WM_HOTKEY)  {
+                window.Toggle();
+            }
+
+            return IntPtr.Zero;
         }
 
         public void Register() {
-            _ = RegisterHotKey(Handle, 0, (int)(KeyModifier.Win | KeyModifier.Ctrl), 'A');
-        }
-
-        protected override void WndProc(ref System.Windows.Forms.Message m) {
-            base.WndProc(ref m);
-
-            if (m.Msg == WM_HOTKEY) {
-                window.Toggle();
-            }
+            var wih = new WindowInteropHelper(window);
+            _ = RegisterHotKey(wih.Handle, 0, (int)(KeyModifier.Win | KeyModifier.Ctrl), 'A');
         }
     }
 }
