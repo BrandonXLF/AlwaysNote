@@ -44,49 +44,44 @@ export component EditorTextInput {
         }
     }
 
-	input := TextInput {	
-		x: 0;
-		y: 0;
-
-		width <=> parent.width;
-		preferred-width <=> parent.preferred-width;
-		min-width <=> parent.min-width;
-		max-width <=> parent.max-width;
-		
-		height <=> parent.width;
-		preferred-height <=> parent.preferred-height;
-		min-height <=> root.min-height;
-		max-height <=> root.max-height;
-
-		text <=> parent.text;
-		
-		selection-foreground-color: ColorPalette.contrast;
-		selection-background-color: ColorPalette.accent;
-		single-line: parent.single-line;
-		wrap: parent.wrap;
-		color: parent.color;
-		
-		edited => {
-			edited();
-		}
-
-		key-pressed(e) => {
-			return key-pressed(e);
-		}
-	}
-
-	/*
-	// TODO: Cannot implement, https://github.com/slint-ui/slint/discussions/6679
 	TouchArea {
 		pointer-event(e) => {
 			if (e.button == PointerEventButton.right && e.kind == PointerEventKind.up) {
 				ctx-menu.x = self.mouse-x + 4px;
 				ctx-menu.y = self.mouse-y + 4px;
 				ctx-menu.show();
-			} else {
-				// ...
+			}
+		}
+
+		input := TextInput {
+			x: 0;
+			y: 0;
+
+			width <=> root.width;
+			preferred-width <=> root.preferred-width;
+			min-width <=> root.min-width;
+			max-width <=> root.max-width;
+			
+			height <=> root.width;
+			preferred-height <=> root.preferred-height;
+			min-height <=> root.min-height;
+			max-height <=> root.max-height;
+
+			text <=> root.text;
+			
+			selection-foreground-color: ColorPalette.contrast;
+			selection-background-color: ColorPalette.accent;
+			single-line: root.single-line;
+			wrap: root.wrap;
+			color: root.color;
+			
+			edited => {
+				edited();
+			}
+
+			key-pressed(e) => {
+				return key-pressed(e);
 			}
 		}
 	}
-	*/
 }
