@@ -75,11 +75,13 @@
             </Button>
             <Popup 
                 Name="ListPopup"
-                Placement="Bottom"
+                Placement="Custom"
                 PlacementTarget="{Binding ElementName=NoteTitle}"
+                CustomPopupPlacementCallback="PlaceListPopup"
                 PopupAnimation="Fade"
                 StaysOpen="False"
                 Focusable="False"
+                HorizontalOffset="-4"
             >
                 <StackPanel Background="{DynamicResource Accent}">
                     <ItemsControl Name="NoteList">

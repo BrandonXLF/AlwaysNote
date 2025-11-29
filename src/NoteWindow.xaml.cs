@@ -121,5 +121,11 @@ namespace AlwaysNote {
                 noteStore.CurrentNote = nameDialog.NewValue;
             }
         }
+
+        private System.Windows.Controls.Primitives.CustomPopupPlacement[] PlaceListPopup(Size popupSize, Size targetSize, Point offset) {
+            return [
+                new(new Point(0, targetSize.Height), System.Windows.Controls.Primitives.PopupPrimaryAxis.Horizontal)
+            ];
+        }
     }
 }
