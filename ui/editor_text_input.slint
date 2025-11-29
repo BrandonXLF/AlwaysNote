@@ -8,9 +8,12 @@ export component EditorTextInput {
 	in property <TextWrap> wrap;
 	in property <brush> color: ColorPalette.opposite;
 	out property <bool> has-focus: input.has-focus;
+	out property <int> anchor_position_byte_offset: input.anchor_position_byte_offset;
+    out property <int> cursor_position_byte_offset: input.cursor_position_byte_offset;
 
 	callback extra-option-chosen(string);
 	callback edited;
+	callback key-pressed(KeyEvent) -> EventResult;
 
 	public function set-selection-offsets(start: int, end: int) {
 		input.set-selection-offsets(start, end);
@@ -65,6 +68,10 @@ export component EditorTextInput {
 		
 		edited => {
 			edited();
+		}
+
+		key-pressed(e) => {
+			return key-pressed(e);
 		}
 	}
 

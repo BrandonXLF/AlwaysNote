@@ -4,11 +4,11 @@ import { NamePrompt } from "name_prompt.slint";
 import { DeletePrompt } from "delete_prompt.slint";
 import { OptionPopup } from "option_popup.slint";
 import { ColorPalette } from "color_palette.slint";
-import { MainInput } from "main_input.slint";
+import { MainInput, MainInputAdapter } from "main_input.slint";
 import { BorderlessWindow } from "borderless_window.slint";
 import { NoteModelAdapter } from "model_adapter.slint";
 
-export { FindReplaceAdapter, ColorPalette, NoteModelAdapter }
+export { FindReplaceAdapter, ColorPalette, NoteModelAdapter, MainInputAdapter }
 
 export global NoteStoreAdapter {
     pure callback get-text(string) -> string;
@@ -24,6 +24,9 @@ export component MainWindow inherits BorderlessWindow {
     property <bool> delete-enabled;
     property <bool> name-enabled;
     property <bool> find-enabled;
+
+    out property <int> main-anchor-byte-pos: main-input.anchor_position_byte_offset;
+    out property <int> main-cursor-byte-pos: main-input.cursor_position_byte_offset;
 
     callback close <=> close-button.clicked;
     callback mouse-move(length, length);
@@ -66,15 +69,11 @@ export component MainWindow inherits BorderlessWindow {
 
     FocusScope {
         key-pressed(e) => {
-            if (e.text == Key.Tab) {
-                return reject;
-            }
-
             if (e.text == Key.Escape) {
                 close-prompts();
             }
 
-            accept
+            reject
         }
 
         VerticalLayout {

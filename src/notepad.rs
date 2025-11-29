@@ -2,7 +2,7 @@ use i_slint_core::items::{TextHorizontalAlignment, TextVerticalAlignment};
 
 use crate::{
     color_palette::{self, ColorValueEventHolder},
-    find_replace,
+    find_replace, main_input,
     note_model::NoteModel,
     note_store::NoteStore,
     store_adapter,
@@ -83,8 +83,9 @@ impl Notepad {
         });
 
         let color_holder = color_palette::init(&win);
-        find_replace::init(&win);
         store_adapter::init(&win);
+        main_input::init(&win);
+        find_replace::init(&win);
 
         win.set_note_names(NoteModel::rc_from_saved(&win).into());
         win.invoke_set_current_note(NoteStore::get_current_note().into());

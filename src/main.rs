@@ -3,6 +3,7 @@
 mod color_palette;
 mod find_replace;
 mod hotkey;
+mod main_input;
 mod note_model;
 mod note_store;
 mod notepad;

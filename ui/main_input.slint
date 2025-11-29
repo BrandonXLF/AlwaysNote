@@ -2,8 +2,14 @@ import { OptionPopup } from "option_popup.slint";
 import { ColorPalette } from "color_palette.slint";
 import { EditorTextInput } from "editor_text_input.slint";
 
+export global MainInputAdapter {
+	callback tab-pressed();
+}
+
 export component MainInput inherits Rectangle {
     in-out property <string> text;
+    out property <int> anchor_position_byte_offset: input.anchor_position_byte_offset;
+    out property <int> cursor_position_byte_offset: input.cursor_position_byte_offset;
 
     callback show-find();
     callback edited <=> input.edited;
@@ -14,35 +20,35 @@ export component MainInput inherits Rectangle {
 
     forward-focus: input;
 
-    FocusScope {
-        key-pressed(e) => {
-            if (e.text == Key.Tab || e.text == Key.Escape) {
-                return reject;
-            }
+    Flickable {
+        viewport-height: input.preferred-height + 8px;
 
-            if (e.modifiers.control && (e.text == "f" || e.text == "F")) {
+        input := EditorTextInput {
+            y: 4px;
+            width: parent.width - 8px;
+            min-height: root.height - 8px;
+            text <=> root.text;
+            single-line: false;
+            wrap: word-wrap;
+
+            extra-options: ["Find"];
+            
+            extra-option-chosen(option) => {
                 show-find();
             }
 
-            accept
-        }
-
-        Flickable {
-            viewport-height: input.preferred-height + 8px;
-
-            input := EditorTextInput {
-                y: 4px;
-                width: parent.width - 8px;
-                min-height: root.height - 8px;
-                text <=> root.text;
-                single-line: false;
-                wrap: word-wrap;
-
-                extra-options: ["Find"];
-                
-                extra-option-chosen(option) => {
+            key-pressed(e) => {
+                if (e.modifiers.control && (e.text == "f" || e.text == "F")) {
                     show-find();
+                    return accept;
                 }
+
+                if (e.text == Key.Tab) {
+                    MainInputAdapter.tab-pressed();
+                    return accept;
+                }
+
+                reject
             }
         }
     }
