@@ -22,7 +22,7 @@ pub fn show(win_weak: slint::Weak<MainWindow>) {
             let _ = s.send(e.clone());
         })
         .icon(icon)
-        .tooltip("AlwaysNote\nWin + Shift + A")
+        .tooltip("AlwaysNote\nWin + Ctrl + A")
         .on_click(TrayIconEvent::Toggle)
         .on_right_click(TrayIconEvent::Menu)
         .menu(

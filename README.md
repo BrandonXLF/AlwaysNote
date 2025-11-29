@@ -1,6 +1,6 @@
 # AlwaysNote
 
-**AlwaysNote** is a Windows application that provides a multi-note notepad that can be shown using Win + Shift + A.
+**AlwaysNote** is a Windows application that provides a multi-note notepad that can be shown using Win + Ctrl + A.
 
 The notepad appears over all other apps, making it perfect for taking notes while using a full screen application.
 
