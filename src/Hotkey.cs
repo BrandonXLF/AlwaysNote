@@ -22,7 +22,7 @@ namespace AlwaysNote {
         }
 
         public void Register() {
-            _ = RegisterHotKey(Handle, 0, (int)(KeyModifier.Win | KeyModifier.Shift), 'A');
+            _ = RegisterHotKey(Handle, 0, (int)(KeyModifier.Win | KeyModifier.Ctrl), 'A');
         }
 
         protected override void WndProc(ref System.Windows.Forms.Message m) {

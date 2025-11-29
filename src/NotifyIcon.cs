@@ -26,7 +26,7 @@ namespace AlwaysNote {
 
             icon = new(new Container()) {
                 Icon = Resources.AppIcon,
-                Text = "AlwaysNote\nWin + Shift + A",
+                Text = "AlwaysNote\nWin + Ctrl + A",
                 ContextMenuStrip = contextMenu
             };
             icon.Click += new EventHandler(IconClicked);
