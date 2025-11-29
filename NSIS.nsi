@@ -49,6 +49,9 @@ Function un.onInit
 FunctionEnd
 
 Section "${APP_NAME}" S1
+	# Uninstall old version
+	ExecWait '"$INSTDIR\${APP_NAME} Uninstaller.exe" /S _?=$INSTDIR'
+
 	SectionIn RO
 	SetOutPath $INSTDIR
 	File /x *.pdb out\Release\*.*
