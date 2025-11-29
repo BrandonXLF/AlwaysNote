@@ -1,8 +1,8 @@
 ﻿using System.Windows;
-using System.Windows.Input;
-using Windows.UI.ViewManagement;
-using System.Windows.Media;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using Windows.UI.ViewManagement;
 
 namespace AlwaysNote {
     public partial class NoteWindow : Window {
@@ -76,16 +76,16 @@ namespace AlwaysNote {
             ListPopup.StaysOpen = false;
         }
 
-        private void NoteListEntry_MouseLeftButtonUp(object sender, RoutedEventArgs e) {
-            noteStore.CurrentNote = (sender as TextBlock).Text;
+        private void NoteListEntry_Click(object sender, RoutedEventArgs e) {
+            noteStore.CurrentNote = (string)(sender as Button).Tag;
             ListPopup.IsOpen = false;
         }
 
         private void Menu_RenameNote(object sender, RoutedEventArgs es) {
             MenuItem menuItem = sender as MenuItem;
             ContextMenu contextMenu = menuItem.Parent as ContextMenu;
-            TextBlock item = contextMenu.PlacementTarget as TextBlock;
-            TextDialog renameDialog = new("Rename Note", "Enter new name", item.Text);
+            string currentName = (string)(contextMenu.PlacementTarget as Button).Tag;
+            TextDialog renameDialog = new("Rename Note", "Enter new name", currentName);
 
             if (renameDialog.ShowDialog() == true) {
                 if (noteStore.NoteNames.Contains(renameDialog.NewValue)) {
@@ -93,18 +93,18 @@ namespace AlwaysNote {
                     return;
                 }
 
-                noteStore.RenameNote(item.Text, renameDialog.NewValue);
+                noteStore.RenameNote(currentName, renameDialog.NewValue);
             }
         }
 
         private void Menu_DeleteNote(object sender, RoutedEventArgs e) {
             MenuItem menuItem = sender as MenuItem;
             ContextMenu contextMenu = menuItem.Parent as ContextMenu;
-            TextBlock item = contextMenu.PlacementTarget as TextBlock;
-            ConfirmDialog deleteDialog = new("Delete Note", "Are you sure you want to delete the note \"" + item.Text + "\"?");
+            string name = (string)(contextMenu.PlacementTarget as Button).Tag;
+            ConfirmDialog deleteDialog = new("Delete Note", "Are you sure you want to delete the note \"" + name + "\"?");
 
             if (deleteDialog.ShowDialog() == true) {
-                noteStore.DeleteNote(item.Text);
+                noteStore.DeleteNote(name);
             }
         }
 

@@ -87,19 +87,21 @@
                     <ItemsControl Name="NoteList">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock
-                                    Text="{Binding}"
-                                    MouseLeftButtonUp="NoteListEntry_MouseLeftButtonUp"
+                                <Button
+                                    Content="{Binding}"
+                                    Tag="{Binding}"
+                                    Click="NoteListEntry_Click"
                                     Padding="5"
                                     Foreground="{DynamicResource AccentOpposite}"
+                                    Style="{StaticResource Transparent}"
                                 >
-                                    <TextBlock.ContextMenu>
+                                    <Button.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="Rename note" Click="Menu_RenameNote" />
                                             <MenuItem Header="Delete note" Click="Menu_DeleteNote" />
                                         </ContextMenu>
-                                    </TextBlock.ContextMenu>
-                                </TextBlock>
+                                    </Button.ContextMenu>
+                                </Button>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
