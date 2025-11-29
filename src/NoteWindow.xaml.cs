@@ -61,7 +61,6 @@ namespace AlwaysNote {
         }
 
         private void Close_Click(object sender, RoutedEventArgs e) {
-            e.Handled = true;
             Hide();
         }
 
@@ -70,17 +69,16 @@ namespace AlwaysNote {
         }
 
         private void NoteTitle_MouseEnter(object sender, MouseEventArgs e) {
-            e.Handled = true;
             ListPopup.StaysOpen = true;
         }
 
         private void NoteTitle_MouseLeave(object sender, MouseEventArgs e) {
-            e.Handled = true;
             ListPopup.StaysOpen = false;
         }
 
         private void NoteListEntry_MouseLeftButtonUp(object sender, RoutedEventArgs e) {
             noteStore.CurrentNote = (sender as TextBlock).Text;
+            ListPopup.IsOpen = false;
         }
 
         private void Menu_RenameNote(object sender, RoutedEventArgs es) {
