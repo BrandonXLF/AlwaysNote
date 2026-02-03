@@ -1,54 +1,76 @@
 ﻿using System;
-using System.Text.RegularExpressions;
-using System.IO;
-using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.Text.RegularExpressions;
+using System.Windows;
 
 namespace AlwaysNote {
-    class NoteStore : INotifyPropertyChanged {
+    partial class NoteStore : INotifyPropertyChanged {
         private readonly string dataFolder;
         private readonly string noteFolder;
-        private readonly Regex matchUntitled = new(@"^Untitled Note (\d+)$");
+        private readonly Regex matchUntitled = GetUntitledRegex();
         private string currentNote;
         private string currentNoteText;
 
-        public readonly ObservableCollection<string> NoteNames = new();
+        public readonly ObservableCollection<string> NoteNames = [];
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <remarks>Get: Throws on failure, Set: Alerts on failure</remarks>
         public string CurrentNote {
             get {
                 EnsureCurrentNote();
-
                 return currentNote;
             }
 
             set {
-                currentNote = value;
-                currentNoteText = GetNoteText(CurrentNote);
+                string newNoteText;
 
+                try {
+                    newNoteText = GetNoteText(value);
+                    EnsureFolderExists(dataFolder);
+                    File.WriteAllText(Path.Combine(dataFolder, "CurrentNote"), value);
+                } catch (IOException e) {
+                    ShowError("Could not set current note to \"" + value + "\".", "Open Note", e);
+                    return;
+                }
+
+                // Switch once committed to file system
+                currentNote = value;
+                currentNoteText = newNoteText;
                 NotifyPropertyChanged("CurrentNote");
                 NotifyPropertyChanged("CurrentNoteText");
-
-                if (!Directory.Exists(dataFolder)) Directory.CreateDirectory(dataFolder);
-
-                File.WriteAllTextAsync(Path.Combine(dataFolder, "CurrentNote"), value);
             }
         }
 
+        /// <remarks>Get: Throws on failure, Set: Alerts on failure</remarks>
         public string CurrentNoteText {
             get {
                 EnsureCurrentNote();
-
                 return currentNoteText;
             }
 
             set {
+                // Record text immediately (before saving file)
                 currentNoteText = value;
-
                 NotifyPropertyChanged("CurrentNoteText");
 
-                SetNoteText(CurrentNote, value);
+                try {
+                    EnsureFolderExists(noteFolder);
+                    File.WriteAllText(GetNotePath(CurrentNote), value);
+                } catch (IOException e) {
+                    ShowError("Could not save note \"" + CurrentNote + "\".", "Save Note", e);
+                }
             }
+        }
+
+        /// <remarks>Throws on failure</remarks>
+        private static void EnsureFolderExists(string folder) {
+            if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+        }
+
+        private static void ShowError(string message, string titleAction, Exception e) {
+            MessageBox.Show(message + "\n\n" + e.Message, titleAction + " Failed", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         public NoteStore() {
@@ -69,96 +91,102 @@ namespace AlwaysNote {
             NotifyPropertyChanged("NoteNames");
         }
 
-        public void LoadNoteNames() {
+        /// <remarks>Throws on failure</remarks>
+        private void LoadNoteNames() {
             if (!Directory.Exists(noteFolder)) return;
 
             string[] filePaths = Directory.GetFiles(noteFolder);
 
             foreach (string filePath in filePaths) {
                 if (Path.GetExtension(filePath) != ".txt") continue;
-
                 NoteNames.Add(Path.GetFileNameWithoutExtension(filePath));
             }
         }
 
-        public void LoadCurrentNote() {
+        /// <remarks>Throws on failure</remarks>
+        private void LoadCurrentNote() {
             if (!File.Exists(Path.Combine(dataFolder, "CurrentNote"))) return;
 
             currentNote = File.ReadAllText(Path.Combine(dataFolder, "CurrentNote"));
             currentNoteText = GetNoteText(CurrentNote);
         }
 
-        public int GetNextUntitledNum() {
-            int nextUntitledNum = 1;
-
-            foreach (string noteName in NoteNames) {
-                Match untitledMatch = matchUntitled.Match(noteName);
-
-                if (!untitledMatch.Success) continue;
-
-                int untitledNum = int.Parse(untitledMatch.Groups[1].Value, System.Globalization.NumberStyles.None);
-
-                if (untitledNum + 1 > nextUntitledNum) {
-                    nextUntitledNum = untitledNum + 1;
-                }
-            }
-
-            return nextUntitledNum;
+        private string GetNotePath(string noteName) {
+            return Path.Combine(noteFolder, noteName + ".txt");
         }
 
-        public string GetNotePath(string noteName) {
-            return Path.Combine(noteFolder, noteName + ".txt"); ;
-        }
-
-        public string GetNoteText(string noteName) {
+        /// <remarks>Throws on failure</remarks>
+        private string GetNoteText(string noteName) {
             string path = GetNotePath(noteName);
-
             return File.Exists(path) ? File.ReadAllText(path) : "";
         }
 
-        public void SetNoteText(string noteName, string noteText) {
-            if (!Directory.Exists(noteFolder)) Directory.CreateDirectory(noteFolder);
+        /// <remarks>Throws on failure</remarks>
+        private void AddNoteThrows(string noteName) {
+            if (noteName == "") noteName = GetUnnamedNoteName();
 
-            File.WriteAllTextAsync(GetNotePath(noteName), noteText);
+            EnsureFolderExists(noteFolder);
+            File.WriteAllText(GetNotePath(noteName), "");
+
+            NoteNames.Add(noteName);
+            CurrentNote = noteName;
         }
 
+        /// <remarks>Alerts on failure</remarks>
         public void AddNote(string noteName) {
             if (noteName == "") noteName = GetUnnamedNoteName();
 
-            NoteNames.Add(noteName);
-            SetNoteText(noteName, "");
+            try {
+                AddNoteThrows(noteName);
+            } catch (IOException e) {
+                ShowError("Could not create note \"" + noteName + "\".", "Create Note", e);
+                return;
+            }
         }
 
+        /// <remarks>Alerts on IO failures, throws if current note cannot be ensured</remarks>
         public void DeleteNote(string noteName) {
-            NoteNames.Remove(noteName);
-
-            EnsureCurrentNote();
-
             string path = GetNotePath(noteName);
+            if (File.Exists(path)) {
+                try {
+                    File.Delete(path);
+                } catch (IOException e) {
+                    ShowError("Could not delete note \"" + noteName + "\".", "Delete Note", e);
+                    return;
+                }
+            }
 
-            if (File.Exists(path)) File.Delete(path);
+            NoteNames.Remove(noteName);
+            EnsureCurrentNote();
         }
 
+        /// <remarks>Alerts on failure</remarks>
         public void RenameNote(string oldNoteName, string newNoteName) {
             if (newNoteName == "") {
                 newNoteName = GetUnnamedNoteName();
             }
 
-            if (File.Exists(GetNotePath(oldNoteName))) {
-                File.Move(GetNotePath(oldNoteName), GetNotePath(newNoteName));
+            string oldPath = GetNotePath(oldNoteName);
+            if (File.Exists(oldPath)) {
+                try {
+                    File.Move(oldPath, GetNotePath(newNoteName));
+                } catch (IOException e) {
+                    ShowError("Could not rename note \"" + oldNoteName + "\" to \"" + newNoteName + "\".", "Rename Note", e);
+                    return;
+                }
             }
 
             NoteNames[NoteNames.IndexOf(oldNoteName)] = newNoteName;
             CurrentNote = newNoteName;
         }
 
+        /// <remarks>Throws on failure</remarks>
         private void EnsureCurrentNote() {
             if (!NoteNames.Contains(currentNote)) {
                 if (NoteNames.Count > 0) {
                     CurrentNote = NoteNames[0];
                 } else {
-                    AddNote("Default");
-                    CurrentNote = "Default";
+                    AddNoteThrows("Default");
                 }
             }
         }
@@ -180,5 +208,8 @@ namespace AlwaysNote {
 
             return "Untitled Note " + nextUntitledNum;
         }
+
+        [GeneratedRegex(@"^Untitled Note (\d+)$")]
+        private static partial Regex GetUntitledRegex();
     }
 }

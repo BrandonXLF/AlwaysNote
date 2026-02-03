@@ -118,7 +118,6 @@ namespace AlwaysNote {
                 }
 
                 noteStore.AddNote(nameDialog.NewValue);
-                noteStore.CurrentNote = nameDialog.NewValue;
             }
         }
 
