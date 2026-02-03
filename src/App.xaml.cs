@@ -26,6 +26,17 @@ namespace AlwaysNote {
                 return;
             }
 
+            AppDomain.CurrentDomain.UnhandledException += (s, e) => {
+                Exception ex = (Exception) e.ExceptionObject;
+
+                MessageBox.Show(
+                    "An unhandled exception occurred.\n\n" + ex.Message,
+                    "AlwaysNote Fatal Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            };
+
             noteWindow = new();
             string[] args = Environment.GetCommandLineArgs();
 
