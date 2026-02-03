@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "AlwaysNote": {
+      "commandName": "Project"
+    },
+    "Minimized": {
+      "commandName": "Project",
+      "commandLineArgs": "--minimized"
+    }
+  }
+}
