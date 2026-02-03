@@ -3,7 +3,7 @@
 
 Name "${APP_NAME}"
 BrandingText " "
-OutFile "out\${APP_NAME} Installer.exe"
+OutFile "out\${APP_NAME}-Installer.exe"
 Unicode True
 
 !define MULTIUSER_MUI
