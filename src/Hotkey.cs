@@ -21,7 +21,8 @@ namespace AlwaysNote {
         public Hotkey(NoteWindow window) {
             this.window = window;
 
-            HwndSource source = PresentationSource.FromVisual(window) as HwndSource;
+            var helper = new WindowInteropHelper(window);
+            HwndSource source = HwndSource.FromHwnd(helper.EnsureHandle());
             source.AddHook(WndProc);
         }
 

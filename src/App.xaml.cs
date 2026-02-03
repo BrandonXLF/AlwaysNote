@@ -30,7 +30,7 @@ namespace AlwaysNote {
             string[] args = Environment.GetCommandLineArgs();
 
             if (args.Length < 2 || args[1] != "--minimized") {
-                noteWindow.Show();
+                noteWindow.Visibility = Visibility.Visible;
             } else {
                 ReduceMemory();
             }
